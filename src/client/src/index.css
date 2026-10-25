@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-void text-silver font-tech antialiased min-h-screen;
+  }
+  ::selection {
+    background: rgba(57, 255, 20, 0.35);
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0d0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e2c1e;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a3f2a;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-panel border border-line rounded-xl;
+  }
+  .btn-neon {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-tech font-bold uppercase tracking-wider text-void bg-neon shadow-neon transition-all duration-200 hover:shadow-neon-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-tech font-semibold uppercase tracking-wider text-neon border border-neon/40 bg-transparent transition-all duration-200 hover:bg-neon/10 hover:border-neon disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-tech font-semibold uppercase tracking-wider text-ash border border-line bg-panel2/60 transition-all duration-200 hover:text-silver hover:border-neon/40 disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .input-dark {
+    @apply w-full bg-void/70 border border-line rounded-lg px-3 py-2.5 text-silver placeholder:text-ash/50 outline-none transition-colors focus:border-neon focus:shadow-neon-sm;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-tech font-bold uppercase tracking-wider text-[11px];
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow:
+      0 0 8px rgba(57, 255, 20, 0.85),
+      0 0 28px rgba(57, 255, 20, 0.4);
+  }
+  .text-glow-soft {
+    text-shadow: 0 0 6px rgba(57, 255, 20, 0.45);
+  }
+  .dot-grid {
+    background-image: radial-gradient(rgba(57, 255, 20, 0.14) 1px, transparent 1.4px);
+    background-size: 20px 20px;
+  }
+  .circuit-bg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%2339FF14' stroke-opacity='0.07' stroke-width='1.5'%3E%3Cpath d='M10 30h60l20 20h80'/%3E%3Cpath d='M30 90h100l20-20h60'/%3E%3Cpath d='M10 150h40l20 20h100l20-20h60'/%3E%3Cpath d='M60 210h80l20-20h60'/%3E%3Cpath d='M200 60v40l-20 20'/%3E%3Cpath d='M120 30v50'/%3E%3C/g%3E%3Cg fill='%2339FF14' fill-opacity='0.10'%3E%3Ccircle cx='10' cy='30' r='2.5'/%3E%3Ccircle cx='170' cy='50' r='2.5'/%3E%3Ccircle cx='210' cy='90' r='2.5'/%3E%3Ccircle cx='250' cy='150' r='2.5'/%3E%3Ccircle cx='220' cy='190' r='2.5'/%3E%3Ccircle cx='160' cy='210' r='2.5'/%3E%3Ccircle cx='120' cy='30' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .skew-racing {
+    transform: skewX(-8deg);
+  }
+}

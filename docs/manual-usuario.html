@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual de Usuario — Carreras Hot Wheels ALANBREX</title>
+<style>
+  :root{
+    --ink:#0b1220;          /* negro profundo de marca */
+    --text:#1f2937;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --neon:#16a34a;         /* verde accesible en blanco */
+    --neon-bright:#39FF14;  /* verde neón de marca (sobre oscuro) */
+    --soft:#f0fdf4;
+    --amber:#b45309;
+    --blue:#1d4ed8;
+  }
+  *{ box-sizing:border-box; }
+  @page{ size:A4; margin:16mm 15mm 18mm 15mm; }
+  html,body{
+    margin:0; padding:0;
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--text); font-size:10.5pt; line-height:1.55;
+  }
+  -webkit-print-color-adjust{ exact; }
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  /* ---------- PORTADA ---------- */
+  .cover{
+    page-break-after:always;
+    background:linear-gradient(160deg,#05070d 0%,#0b1220 55%,#101a12 100%);
+    color:#e5e7eb;
+    min-height:250mm;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:24mm 20mm;
+    position:relative; overflow:hidden;
+  }
+  .cover::before{
+    content:""; position:absolute; inset:0;
+    background:
+      repeating-linear-gradient(90deg, rgba(57,255,20,.045) 0 2px, transparent 2px 26px),
+      repeating-linear-gradient(0deg, rgba(57,255,20,.035) 0 1px, transparent 1px 26px);
+  }
+  .cover .kicker{
+    font-family:Consolas,monospace; letter-spacing:.45em; text-transform:uppercase;
+    color:var(--neon-bright); font-size:10pt;
+  }
+  .cover h1{
+    font-family:Georgia,"Times New Roman",serif; font-style:italic; font-weight:800;
+    font-size:34pt; line-height:1.05; margin:.4em 0 .2em; color:#f3f4f6;
+  }
+  .cover h1 .hl{ color:var(--neon-bright); }
+  .cover .sub{ font-size:12pt; color:#9ca3af; max-width:150mm; }
+  .cover .meta{ margin-top:30mm; }
+  .cover table{ border-collapse:collapse; font-size:10pt; color:#d1d5db; }
+  .cover td{ padding:4pt 0 4pt 0; }
+  .cover td.k{ font-family:Consolas,monospace; text-transform:uppercase; font-size:8.5pt;
+    letter-spacing:.25em; color:var(--neon-bright); padding-right:22pt; width:38mm; }
+  .cover .lanes{ display:flex; gap:8px; margin-top:14mm; }
+  .cover .lane{
+    width:22mm; height:8mm; border-radius:4px;
+    border:1px solid rgba(57,255,20,.45); background:rgba(57,255,20,.07);
+    display:flex; align-items:center; justify-content:center;
+    font-family:Consolas,monospace; font-size:7.5pt; color:var(--neon-bright);
+    letter-spacing:.2em;
+  }
+  .cover .footerline{
+    border-top:1px solid rgba(57,255,20,.35); padding-top:12pt;
+    font-family:Consolas,monospace; font-size:8.5pt; letter-spacing:.3em;
+    text-transform:uppercase; color:#9ca3af;
+  }
+  .cover .fw{ position:relative; z-index:2; }
+
+  /* ---------- CABECERAS DE PÁGINA ---------- */
+  .pagehead{
+    border-bottom:2pt solid var(--ink); padding-bottom:6pt; margin-bottom:14pt;
+  }
+  .pagehead .kick{
+    font-family:Consolas,monospace; font-size:8.5pt; letter-spacing:.3em;
+    text-transform:uppercase; color:var(--neon);
+  }
+  h1.sec{
+    font-family:Georgia,serif; font-style:italic; font-weight:800;
+    font-size:19pt; color:var(--ink); margin:2pt 0 0;
+  }
+  h2{ font-family:Georgia,serif; font-size:13.5pt; color:var(--ink); margin:20pt 0 6pt;
+      border-left:4pt solid var(--neon); padding-left:8pt; }
+  h3{ font-size:11pt; color:var(--ink); margin:14pt 0 4pt; }
+  p{ margin:4pt 0 8pt; }
+  ul,ol{ margin:4pt 0 8pt; padding-left:18pt; }
+  li{ margin-bottom:3pt; }
+  strong{ color:var(--ink); }
+  code,kbd{
+    font-family:Consolas,monospace; font-size:9pt;
+    background:#f1f5f9; border:1px solid var(--line); border-radius:3px; padding:1pt 4pt;
+  }
+  .kbd{
+    display:inline-block; background:var(--ink); color:#fff; border-radius:3px;
+    font-family:Consolas,monospace; font-size:8.5pt; padding:1pt 6pt;
+  }
+  .page{ page-break-after:always; }
+  .pagebreak{ page-break-before:always; }
+
+  /* ---------- TABLAS ---------- */
+  table.t{ border-collapse:collapse; width:100%; margin:8pt 0 12pt; font-size:9.5pt; }
+  table.t th{
+    background:var(--ink); color:#fff; text-align:left; padding:6pt 8pt;
+    font-weight:600; font-size:9pt; letter-spacing:.04em;
+  }
+  table.t td{ border-bottom:1px solid var(--line); padding:6pt 8pt; vertical-align:top; }
+  table.t tr:nth-child(even) td{ background:#f8fafc; }
+  .pill{
+    display:inline-block; border-radius:10pt; padding:0 8pt; font-size:8pt;
+    font-family:Consolas,monospace; border:1px solid currentColor; white-space:nowrap;
+  }
+  .pill.green{ color:var(--neon); background:var(--soft); }
+  .pill.amber{ color:var(--amber); background:#fffbeb; }
+  .pill.blue{ color:var(--blue); background:#eff6ff; }
+  .pill.red{ color:#b91c1c; background:#fef2f2; }
+  .pill.gray{ color:#475569; background:#f1f5f9; }
+
+  /* ---------- CAJAS ---------- */
+  .steps{ margin:10pt 0; }
+  .step{ display:flex; gap:10pt; margin-bottom:10pt; page-break-inside:avoid; }
+  .step .n{
+    flex:0 0 auto; width:20pt; height:20pt; border-radius:50%;
+    background:var(--ink); color:var(--neon-bright); font-family:Consolas,monospace;
+    display:flex; align-items:center; justify-content:center; font-size:9pt; margin-top:1pt;
+  }
+  .step .b{ flex:1 1 auto; }
+  .callout{
+    border:1px solid; border-left-width:4pt; border-radius:6pt;
+    padding:8pt 10pt; margin:10pt 0; font-size:9.5pt; page-break-inside:avoid;
+  }
+  .callout .ct{
+    font-family:Consolas,monospace; text-transform:uppercase; letter-spacing:.2em;
+    font-size:8pt; display:block; margin-bottom:3pt;
+  }
+  .callout.tip{ border-color:#86efac; border-left-color:var(--neon); background:var(--soft); }
+  .callout.tip .ct{ color:var(--neon); }
+  .callout.warn{ border-color:#fcd34d; border-left-color:#d97706; background:#fffbeb; }
+  .callout.warn .ct{ color:var(--amber); }
+  .callout.note{ border-color:#93c5fd; border-left-color:var(--blue); background:#eff6ff; }
+  .callout.note .ct{ color:var(--blue); }
+
+  .uiflow{
+    border:1px solid var(--line); border-radius:6pt; background:#f8fafc;
+    padding:8pt 10pt; margin:6pt 0 10pt; font-size:9.5pt;
+  }
+  .uiflow b{ color:var(--ink); }
+  .arrow{ color:var(--neon); font-weight:700; }
+
+  /* ---------- ÍNDICE ---------- */
+  .toc{ page-break-after:always; }
+  .toc h1{ font-family:Georgia,serif; font-style:italic; font-size:18pt; color:var(--ink);
+           border-bottom:2pt solid var(--ink); padding-bottom:6pt; }
+  .toc ol{ list-style:none; padding:0; margin:14pt 0; }
+  .toc li{
+    display:flex; align-items:baseline; gap:8pt; padding:5pt 0;
+    border-bottom:1px dotted var(--line); font-size:11pt;
+  }
+  .toc li .tn{ font-family:Consolas,monospace; color:var(--neon); flex:0 0 auto; width:20pt; }
+  .toc li .t{ color:var(--text); }
+
+  .footer-brand{
+    margin-top:18pt; border-top:1px solid var(--line); padding-top:6pt;
+    font-family:Consolas,monospace; font-size:8pt; letter-spacing:.25em;
+    text-transform:uppercase; color:var(--muted);
+    display:flex; justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<div class="cover">
+  <div class="fw">
+    <div class="kicker">ALANBREX &middot; Manual de usuario</div>
+    <h1>CARRERAS<br><span class="hl">HOT WHEELS</span></h1>
+    <div class="sub">Plataforma de inscripción y administración de carreras de seis carriles:
+      reserva de carril, pago por WhatsApp, panel del organizador y pantalla en vivo para transmisiones.</div>
+    <div class="lanes">
+      <div class="lane">CARRIL 1</div><div class="lane">CARRIL 2</div><div class="lane">CARRIL 3</div>
+      <div class="lane">CARRIL 4</div><div class="lane">CARRIL 5</div><div class="lane">CARRIL 6</div>
+    </div>
+  </div>
+  <div class="fw meta">
+    <table>
+      <tr><td class="k">Versión</td><td>1.0</td></tr>
+      <tr><td class="k">Fecha</td><td>Octubre de 2026</td></tr>
+      <tr><td class="k">Audiencia</td><td>Participantes, organizadores y operadores de transmisión</td></tr>
+      <tr><td class="k">Estado</td><td>Documento para usuarios finales y operadores del sistema</td></tr>
+    </table>
+  </div>
+  <div class="fw footerline">SEIS CARRILES &middot; UN GANADOR &middot; POWERED BY ALANBREX STREAM</div>
+</div>
+
+<!-- ============ ÍNDICE ============ -->
+<div class="toc">
+  <h1>Contenido</h1>
+  <ol>
+    <li><span class="tn">1</span><span class="t">Presentación del sistema</span></li>
+    <li><span class="tn">2</span><span class="t">Accesos principales del sistema</span></li>
+    <li><span class="tn">3</span><span class="t">Manual del participante &mdash; cómo inscribirte</span></li>
+    <li><span class="tn">4</span><span class="t">Manual del participante &mdash; estado de tu reserva</span></li>
+    <li><span class="tn">5</span><span class="t">Manual del organizador &mdash; acceso al panel</span></li>
+    <li><span class="tn">6</span><span class="t">Manual del organizador &mdash; pestañas del panel</span></li>
+    <li><span class="tn">7</span><span class="t">Pantalla en vivo (/stream) y transmisión con OBS Studio</span></li>
+    <li><span class="tn">8</span><span class="t">Estados del sistema</span></li>
+    <li><span class="tn">9</span><span class="t">Reglas que debes conocer</span></li>
+    <li><span class="tn">10</span><span class="t">Problemas frecuentes y su solución</span></li>
+    <li><span class="tn">11</span><span class="t">Preguntas frecuentes</span></li>
+    <li><span class="tn">12</span><span class="t">Glosario</span></li>
+  </ol>
+</div>
+
+<!-- ============ 1. PRESENTACIÓN ============ -->
+<div>
+  <div class="pagehead"><span class="kick">Manual de usuario</span><h1 class="sec">1. Presentación del sistema</h1></div>
+
+  <p><strong>Carreras Hot Wheels — ALANBREX</strong> es la plataforma oficial para administrar y vivir
+  las carreras de coches <em>Hot Wheels</em> en pista de <strong>seis carriles</strong>. El sistema gestiona
+  todo el ciclo de un evento: la <strong>inscripción de participantes</strong>, la <strong>reserva de carriles</strong>,
+  la <strong>confirmación de pagos por WhatsApp</strong>, la <strong>organización de jornadas y carreras</strong>,
+  el <strong>registro de ganadores</strong> y una <strong>pantalla pública en vivo</strong> lista para
+  transmitirse con OBS Studio.</p>
+
+  <h2>¿Quién usa el sistema?</h2>
+  <table class="t">
+    <tr><th style="width:32%">Perfil</th><th>Qué hace con el sistema</th></tr>
+    <tr><td><strong>Participante</strong><br><span class="pill gray">público</span></td>
+        <td>Elige su carrera y carril en la página de inicio, selecciona su coche, envía sus datos y
+            solicita el pago por WhatsApp. Consulta el estado de su reserva con el enlace personal.</td></tr>
+    <tr><td><strong>Organizador (administrador)</strong><br><span class="pill green">panel /admin</span></td>
+        <td>Crea jornadas y carreras, administra la flota de coches, confirma o cancela pagos, gestiona
+            expiraciones, registra ganadores y configura los ajustes del negocio.</td></tr>
+    <tr><td><strong>Operador de transmisión</strong><br><span class="pill gray">público</span></td>
+        <td>Captura la pantalla <code>/stream</code> en OBS Studio para mostrar la parrilla, el estado de
+            la carrera y al ganador en el stream.</td></tr>
+  </table>
+
+  <h2>¿Cómo funciona en una frase?</h2>
+  <div class="uiflow">
+    El participante aparta un carril <span class="arrow">&rarr;</span> paga y envía su comprobante por
+    WhatsApp <span class="arrow">&rarr;</span> el organizador confirma el pago en el panel
+    <span class="arrow">&rarr;</span> el sistema mantiene apartado el carril, arma las carreras de seis
+    <span class="arrow">&rarr;</span> se registra al ganador <span class="arrow">&rarr;</span> la pantalla
+    <code>/stream</code> muestra todo en vivo.
+  </div>
+
+  <div class="callout note">
+    <span class="ct">Importante</span>
+    El sistema <strong>no cobra ni verifica pagos automáticamente</strong>. El pago llega por WhatsApp y
+    el organizador lo confirma manualmente en el panel. Esto garantiza control total, pero implica que la
+    confirmación es un paso humano obligatorio.
+  </div>
+</div>
+
+<!-- ============ 2. ACCESOS ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Manual de usuario</span><h1 class="sec">2. Accesos principales del sistema</h1></div>
+
+  <p>Toda la plataforma se usa desde el navegador, en computadora o celular. Sustituye
+  <code>tu-dominio.com</code> por la dirección real donde esté instalado el sistema.</p>
+
+  <table class="t">
+    <tr><th style="width:36%">Dirección</th><th style="width:20%">Para quién</th><th>Qué encontrarás</th></tr>
+    <tr><td><code>https://tu-dominio.com/</code></td><td>Participantes</td>
+        <td>Página de inscripción: jornadas activas, carreras abiertas, mapa de carriles y flota de coches.</td></tr>
+    <tr><td><code>https://tu-dominio.com/status/&lt;token&gt;</code></td><td>Participantes</td>
+        <td>Estado personalizado de tu reserva: tiempo restante, pago confirmado, expirada o cancelada.</td></tr>
+    <tr><td><code>https://tu-dominio.com/stream</code></td><td>Transmisión / público</td>
+        <td>Pantalla en vivo 16:9 con la carrera seleccionada, la parrilla de seis carriles y el ganador.</td></tr>
+    <tr><td><code>https://tu-dominio.com/admin</code></td><td>Organizador</td>
+        <td>Panel administrativo protegido con usuario y contraseña (requiere inicio de sesión).</td></tr>
+    <tr><td><code>https://tu-dominio.com/api/health</code></td><td>Técnico</td>
+        <td>Ping de estado del servicio: <code>{"ok":true,"db":true}</code> significa que todo funciona.</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <span class="ct">Consejo</span>
+    En la página de inscripción, la barra superior tiene accesos directos a
+    <span class="kbd">Carreras</span>, <span class="kbd">En vivo</span> y <span class="kbd">Admin</span>,
+    además del botón <span class="kbd">Inscríbete ahora</span> que lleva directo al mapa de carriles.
+  </div>
+
+  <h2>Requisitos para usar el sistema</h2>
+  <ul>
+    <li>Un navegador moderno (Chrome, Edge, Firefox o Safari) actualizado.</li>
+    <li>Para el participante: WhatsApp instalado o WhatsApp Web para enviar la solicitud y el comprobante.</li>
+    <li>Para el organizador: las credenciales de administrador entregadas por el responsable del sistema.</li>
+    <li>Para la transmisión: OBS Studio instalado en la computadora del streamer.</li>
+  </ul>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 3. PARTICIPANTE: INSCRIPCIÓN ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Participante</span><h1 class="sec">3. Manual del participante — cómo inscribirte</h1></div>
+
+  <p>La inscripción <strong>no requiere crear cuenta ni registrarse</strong>. Solo necesitas elegir
+  carrera, carril, coche y dar tus datos de contacto. El flujo completo es:</p>
+
+  <div class="uiflow">
+    <b>1. Elegir carril</b> <span class="arrow">&rarr;</span>
+    <b>2. Elegir coche</b> <span class="arrow">&rarr;</span>
+    <b>3. Tus datos</b> <span class="arrow">&rarr;</span>
+    <b>4. Reservar y continuar</b> <span class="arrow">&rarr;</span>
+    <b>5. Pago por WhatsApp</b> <span class="arrow">&rarr;</span>
+    <b>6. Confirmación del organizador</b>
+  </div>
+
+  <h2>3.1 Abrir la página de inscripción</h2>
+  <p>Entra a <code>https://tu-dominio.com/</code>. Verás el diseño oficial ALANBREX, la
+  <strong>jornada actual</strong> con su cuota de inscripción (si aplica) y las
+  <strong>carreras abiertas</strong> del momento. Cada carrera se muestra como una tarjeta con:</p>
+  <ul>
+    <li>El <strong>número de carrera</strong> (#1, #2, ...) y su estado (p. ej. <span class="pill green">ABIERTA</span>).</li>
+    <li>Cuántos carriles quedan libres: <code>4/6 libres</code>.</li>
+    <li>La lista de <strong>seis carriles</strong>: los libres son clicables; los ocupados muestran el nombre del participante elegido.</li>
+  </ul>
+
+  <h2>3.2 Elegir carrera y carril</h2>
+  <ol>
+    <li>Identifica la tarjeta de la carrera en la que quieres correr.</li>
+    <li>Haz clic sobre un <strong>carril libre</strong> (o el botón <span class="kbd">Elegir carril</span> de la tarjeta).</li>
+    <li>La página baja automáticamente a la sección <strong>«Reserva tu carril»</strong>. Verás el paso
+        <b>01 · Elige tu carril</b> con tu carril seleccionado en verde; puedes cambiarlo aquí si te equivocaste.</li>
+  </ol>
+  <div class="callout tip">
+    <span class="ct">Consejo</span>
+    Los carriles se apartan en cuanto se envía la solicitud: <strong>un carril con reserva en pago
+    pendiente o ya pagado ya no se puede escoger para esa carrera</strong> por nadie más. Solo vuelve a
+    quedar disponible si la solicitud expira o se cancela, cuando se libera (por defecto 30 minutos,
+    y el organizador puede <em>extender tu plazo</em> si lo necesitas). En carreras distintas de la
+    jornada, los mismos carriles sí pueden volver a usarse.
+  </div>
+
+  <h2>3.3 Elegir tu coche</h2>
+  <p>En el paso <b>02 · Elige tu coche</b> aparece la flota disponible: tarjetas con foto, nombre, modelo y color.
+  Haz clic en tu coche favorito. Ten en cuenta que <strong>un automóvil con reserva ya pagada o con pago
+  pendiente ya no se puede escoger para esa misma carrera</strong>: su tarjeta aparece en gris con la
+  etiqueta <em>«Reservado»</em> y no se puede seleccionar (puedes reservar ese mismo coche en carreras
+  distintas de la jornada). Aun así, si por alguna razón se intenta usar un coche ocupado, el sistema lo
+  rechazará con el aviso «Ese coche ya está reservado en esta carrera».</p>
+
+  <h2>3.4 Enviar tus datos</h2>
+  <p>En el paso <b>03 · Tus datos</b> completa el formulario:</p>
+  <table class="t">
+    <tr><th style="width:34%">Campo</th><th>Ejemplo / notas</th></tr>
+    <tr><td><strong>Nombre del participante</strong></td><td>Mínimo 2 caracteres. Es el nombre que se mostrará en las pantallas.</td></tr>
+    <tr><td><strong>WhatsApp de contacto</strong></td><td>Ej. <code>55 1234 5678</code>. Es por donde el organizador te contactará.</td></tr>
+  </table>
+  <p>Antes del botón final verás un <strong>resumen</strong>:</p>
+  <div class="uiflow"><b>Resumen:</b> Carrera #3 &middot; Carril 5 &middot; Roxo Speed &middot; Cuota $100</div>
+  <p>Presiona el botón verde <span class="kbd">Reservar y continuar</span>. El sistema:</p>
+  <ol>
+    <li><strong>Apaga tu carril y tu coche</strong> para que nadie más pueda tomarlos mientras tu solicitud esté activa.</li>
+    <li>Guarda la solicitud con estado <span class="pill amber">PAGO PENDIENTE</span>.</li>
+    <li>Te lleva automáticamente a la página de <strong>estado de tu reserva</strong>, con tu enlace personal (token).</li>
+  </ol>
+
+  <h2>3.5 Enviar el pago por WhatsApp</h2>
+  <p>En la página de estado verás el botón <span class="kbd">Enviar comprobante por WhatsApp</span>. Al pulsarlo se abre
+  WhatsApp con un <strong>mensaje preparado</strong> que contiene: tu solicitud de inscripción, la carrera, el carril,
+  el coche, tu contacto y la cuota sugerida. Solo debes:</p>
+  <ol>
+    <li>Realizar el pago con el método que indique el organizador (efectivo al llegar, transferencia, etc.).</li>
+    <li><strong>Enviar el comprobante</strong> por ese chat o al número del negocio.</li>
+    <li>Esperar a que el organizador confirme tu pago en el panel.</li>
+  </ol>
+  <div class="callout warn">
+    <span class="ct">Atención</span>
+    Tu reserva expira si el pago no se recibe dentro del plazo. Si la página de estado llega a
+    <span class="pill amber">EXPIRADA</span>, no podremos confirmarte: comunícate con el organizador para que
+    <em>reactive</em> tu solicitud (si el carril sigue libre) o inscríbete de nuevo.
+  </div>
+
+  <h2>3.6 Seguir los resultados</h2>
+  <p>Al final de la página de inscripción está la sección <strong>«Últimos ganadores»</strong>: la lista de
+  ganadores recientes con su carrera, nombre y coche. También puedes verlo todo en vivo en
+  <code>/stream</code> o tocar <span class="kbd">Ver en vivo</span>.</p>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 4. PARTICIPANTE: ESTADO DE RESERVA ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Participante</span><h1 class="sec">4. Manual del participante — estado de tu reserva</h1></div>
+
+  <p>Después de inscribirte llegas a una página <strong>pública y personal</strong>
+  (<code>/status/&lt;token&gt;</code>) que muestra el estado de tu reserva y se
+  <strong>actualiza sola cada 5 segundos</strong>: no hace falta recargar. Guárdala en favoritos;
+  esa es tu pantalla de glaciar del proceso.</p>
+
+  <h2>4.1 Qué muestran los detalles</h2>
+  <table class="t">
+    <tr><th style="width:28%">Dato</th><th>Descripción</th></tr>
+    <tr><td><strong>Jornada</strong></td><td>Evento actual al que te inscribiste.</td></tr>
+    <tr><td><strong>Carrera</strong></td><td>Número de carrera asignado.</td></tr>
+    <tr><td><strong>Carril</strong></td><td>Carril de pista reservado para ti (1 al 6).</td></tr>
+    <tr><td><strong>Coche</strong></td><td>Coche elegido para competir.</td></tr>
+    <tr><td><strong>Participante</strong></td><td>Nombre que aparecerá en las pantallas.</td></tr>
+    <tr><td><strong>Referencia</strong></td><td>Código corto (8 caracteres) útil para queces al hablar con el organizador.</td></tr>
+  </table>
+
+  <h2>4.2 Los cuatro estados posibles</h2>
+  <table class="t">
+    <tr><th style="width:26%">Estado</th><th>Significado</th><th style="width:30%">Qué hacer</th></tr>
+    <tr>
+      <td><span class="pill green">CONFIRMADO</span><br><em>«¡Estás dentro!»</em></td>
+      <td>Tu pago fue confirmado por el organizador. Tu lugar está garantizado.</td>
+      <td>Presentarte a tu carrera. ¡Listo para correr!</td>
+    </tr>
+    <tr>
+      <td><span class="pill amber">PAGO PENDIENTE</span><br><em>«Reserva apartada»</em></td>
+      <td>Tu solicitud está guardada y tu carril apartado; falta confirmar el pago.</td>
+      <td>Enviar el comprobante por WhatsApp y esperar la confirmación. La pantalla muestra el <strong>tiempo restante</strong> en cuenta regresiva.</td>
+    </tr>
+    <tr>
+      <td><span class="pill amber" style="color:#854d0e">EXPIRADA</span></td>
+      <td>El plazo de pago terminó y no se recibió el pago.</td>
+      <td>Pedir al organizador que <em>reactive</em> la solicitud (se revalida que el carril y el coche sigan libres) o inscribirte de nuevo.</td>
+    </tr>
+    <tr>
+      <td><span class="pill red">CANCELADA</span></td>
+      <td>El organizador canceló tu reserva (p. ej. por duplicado o por falta de pago extendida).</td>
+      <td>Inscribirte de nuevo en otro carril libre si sigue interesado.</td>
+    </tr>
+  </table>
+
+  <div class="callout note">
+    <span class="ct">Dato útil</span>
+    Si la reserva está <em>pendiente de pago</em>, la página de estado también muestra el botón
+    <span class="kbd">Enviar comprobante por WhatsApp</span> por si se te cerró el chat.
+  </div>
+
+  <h2>4.3 Cómo seguir tu reserva seguro</h2>
+  <ul>
+    <li><strong>El enlace es personal:</strong> cualquiera con el enlace puede ver tu estado; guárdalo o compártelo solo con quien necesite.</li>
+    <li><strong>No recargues para actualizar:</strong> la página se refresca sola (verás «Actualización automática activa»). Si muestra «Reconectando…», tu conexión está inestable; en unos segundos volverá.</li>
+    <li><strong>Si pierdes el enlace:</strong> pídeselo al organizador; él lo ve en el panel (pestaña <em>Inscripciones</em> &rarr; campo <em>token/referencia</em>).</li>
+  </ul>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 5. ORGANIZADOR: ACCESO ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Organizador</span><h1 class="sec">5. Manual del organizador — acceso al panel</h1></div>
+
+  <p>El panel de administración está en <code>https://tu-dominio.com/admin</code>. Es la única zona del
+  sistema que requiere credenciales y de donde se administran <strong>todos</strong> los datos.</p>
+
+  <h2>5.1 Iniciar sesión</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div class="b">Abre <code>/admin</code>. Si no has iniciado sesión, verás el <strong>formulario de acceso</strong>.</div></div>
+    <div class="step"><div class="n">2</div><div class="b">Escribe tu <strong>usuario</strong> y <strong>contraseña</strong> de administrador y envía el formulario.</div></div>
+    <div class="step"><div class="n">3</div><div class="b">Entrarás al panel con seis pestañas. La sesión de cookies de navegador se mantiene abierta durante la duración configurada (por defecto <strong>12 horas</strong>).</div></div>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">Seguridad</span>
+    <ul style="margin-bottom:2pt">
+      <li>Las contraseñas se guardan cifradas y las sesiones usan cookies seguras; nunca compartas tus credenciales.</li>
+      <li>Las acciones críticas quedan registradas en la <em>bitácora</em> (pestaña <em>Ajustes &amp; Historial</em>).</li>
+      <li> Tras mucho tiempo inactivo el token de seguridad puede expirar: si alguna acción falla
+           con error de seguridad (403), <strong>recarga la página del panel</strong> y reintenta.</li>
+    </ul>
+  </div>
+
+  <h2>5.2 Cerrar sesión</h2>
+  <p>Usa el botón de salir del panel al terminar en una computadora compartida. La interfaz se cierra
+  y la pestaña quedará requiringo login al volver.</p>
+
+  <h2>5.3 Cómo se actualiza el panel</h2>
+  <p>El panel se refresca <strong>automáticamente cada 3–5 segundos</strong> (configurable). Los datos de
+  reservas, pagos y la carrera activa llegan solos; verás los cambios sin recargar cuando varios
+  organizadores trabajen a la vez o cuando un participante se inscriba en ese momento.</p>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 6. ORGANIZADOR: PESTAÑAS ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Organizador</span><h1 class="sec">6. Manual del organizador — pestañas del panel</h1></div>
+
+  <p>Al entrar, el panel organiza el trabajo diario en seis pestañas:</p>
+  <table class="t">
+    <tr><th style="width:22%">Pestaña</th><th>Para qué sirve</th></tr>
+    <tr><td>1 · <strong>Resumen</strong></td><td>Métricas y acciones rápidas del día.</td></tr>
+    <tr><td>2 · <strong>Jornadas</strong></td><td>Crear y ordenar los eventos (jornadas).</td></tr>
+    <tr><td>3 · <strong>Carreras</strong></td><td>Crear carreras, controlar su estado y nombrar ganadores.</td></tr>
+    <tr><td>4 · <strong>Coches</strong></td><td>Administrar la flota de coches participantes.</td></tr>
+    <tr><td>5 · <strong>Inscripciones</strong></td><td>Confirmar pagos, extender plazos, cancelar o reactivar solicitudes.</td></tr>
+    <tr><td>6 · <strong>Ajustes &amp; Historial</strong></td><td>Configurar WhatsApp, cuota, tiempos y ver la bitácora.</td></tr>
+  </table>
+
+  <h2>6.1 Pestaña «Resumen»</h2>
+  <p>Es tu <strong>tablero de control</strong>: cuántos pagos están pendientes, cuántas inscripciones confirmadas,
+  cuántas carreras abiertas y cuántos coches hay. Debajo, la <strong>lista rápida de pagos pendientes</strong> con
+  botones para <span class="kbd">Confirmar pago</span> o <span class="kbd">Cancelar</span> sin entrar a otros menús,
+  y la <strong>actividad reciente</strong> del sistema.</p>
+
+  <h2>6.2 Pestaña «Jornadas»</h2>
+  <p>Una <em>jornada</em> es un evento (un día de carreras) que agrupa varias carreras. Acciones:</p>
+  <table class="t">
+    <tr><th style="width:30%">Acción</th><th>Uso</th></tr>
+    <tr><td><span class="kbd">Nueva jornada</span></td><td>Crea un evento nuevo con nombre y descripción.</td></tr>
+    <tr><td><strong>Marcar como actual</strong></td><td>Hace que esa jornada sea la que ve el público en <code>/</code> y <code>/stream</code>. Solo puede haber una actual a la vez.</td></tr>
+    <tr><td><strong>Cerrar</strong></td><td>Termina la jornada: deja de publicarse.</td></tr>
+    <tr><td><strong>Reactivar / Archivar</strong></td><td>Vuelve a activar una jornada pasada, o la ordena en el archivo histórico.</td></tr>
+  </table>
+
+  <h2>6.3 Pestaña «Carreras»</h2>
+  <p>Cada jornada puede tener varias carreras. La <strong>numeración es automática</strong> (1, 2, 3...).
+  El flujo típico de control de una carrera:</p>
+  <div class="uiflow">
+    <b>Crear carrera</b> <span class="arrow">&rarr;</span> (se llenan los 6 carriles) <span class="arrow">&rarr;</span>
+    <b>Iniciar</b> <span class="arrow">&rarr;</span> <b>Finalizar</b> <span class="arrow">&rarr;</span>
+    <b>Registrar ganador</b>
+  </div>
+  <table class="t">
+    <tr><th style="width:30%">Botón</th><th>Qué hace</th><th style="width:20%">Cuándo aparece</th></tr>
+    <tr><td><strong>Crear carrera</strong></td><td>Añade una carrera nueva abierta (con 6 carriles libres).</td><td>Siempre</td></tr>
+    <tr><td><span class="kbd">Mostrar en /stream</span></td><td>Selecciona esta carrera como la que muestra la pantalla pública en vivo.</td><td>En carreras abiertas, en marcha o finalizadas que no estén ya en pantalla</td></tr>
+    <tr><td><span class="kbd">Iniciar</span></td><td>Cambia el estado a «en marcha»; deja de aceptar inscripciones.</td><td>Carrera abierta</td></tr>
+    <tr><td><span class="kbd">Finalizar</span></td><td>Cierra la carrera tras correrse.</td><td>Carrera en marcha</td></tr>
+    <tr><td><span class="kbd">Reabrir</span></td><td>Vuelve a ponerla abierta si se terminó por error.</td><td>Carrera finalizada</td></tr>
+    <tr><td><span class="kbd">Cancelar carrera</span></td><td>Anula la carrera y <strong>libera todos sus carriles y coches</strong>.</td><td>Carreras abiertas o en marcha</td></tr>
+    <tr><td><span class="kbd">Registrar ganador</span></td><td>Activa el modo de selección: <em>«Haz clic en un carril CONFIRMADO»</em> para nombrar al ganador.</td><td>Carrera terminada</td></tr>
+    <tr><td><span class="kbd">Quitar ganador</span></td><td>Corrige un registro equivocado y deja la carrera sin ganador.</td><td>Carrera con ganador</td></tr>
+  </table>
+  <div class="callout tip">
+    <span class="ct">Automático</span>
+    Cuando se confirma el pago que <strong>completa los 6 participantes</strong> de una carrera, o se
+    registra un ganador, el sistema <strong>habilita automáticamente la siguiente carrera</strong>. No
+    necesitas crearla manualmente si el ciclo está preparado.
+  </div>
+
+  <h2>6.4 Pestaña «Coches»</h2>
+  <p>Administra la <strong>flota</strong>: alta de coches con <em>nombre, modelo, color e imagen</em>; edición
+  de datos; activar/desactivar (los desactivados no aparecen al público) y baja definitiva cuando ya no
+  se usará. Recomendamos cargar las fotos optimizadas (no muy pesadas) para que el sitio vaya rápido.</p>
+
+  <h2>6.5 Pestaña «Inscripciones» — el trabajo clave</h2>
+  <p>Es donde se procesa el pago de cada participante. Arriba hay <strong>filtros de estado</strong>:</p>
+  <p><span class="pill gray">Todas</span>&nbsp;<span class="pill amber">Pendiente de pago</span>&nbsp;
+     <span class="pill green">Confirmadas</span>&nbsp;
+     <span class="pill amber" style="color:#854d0e">Expiradas</span>&nbsp;
+     <span class="pill red">Canceladas</span></p>
+  <p>Cada fila muestra el participante, la carrera, el carril, el coche, su estado y sus acciones:</p>
+  <table class="t">
+    <tr><th style="width:30%">Acción</th><th>Cuándo usarla</th><th>Detalles</th></tr>
+    <tr><td><span class="kbd">Confirmar pago</span></td>
+        <td>Ya llegó el comprobante o el efectivo.</td>
+        <td>Abre una ventana con los campos <strong>Método</strong> (p. ej. efectivo, transferencia),
+            <strong>Monto (opcional)</strong>, <strong>Referencia (opcional)</strong> y <strong>Nota (opcional)</strong>.
+            La confirmación es segura: si se pulsa dos veces, <strong>no duplica</strong> el pago.</td></tr>
+    <tr><td><span class="kbd">Extender</span></td>
+        <td>El participante prometió pagar más tarde y su plazo se agota.</td>
+        <td>Da más tiempo antes de que la solicitud expire (el título del botón es «Extender el plazo de pago»).</td></tr>
+    <tr><td><span class="kbd">Reactivar</span></td>
+        <td>El pago llegó pero la solicitud ya expiró.</td>
+        <td><strong>Revalida</strong> que el carril y el coche sigan libres antes de reactivar. Si siguen libres,
+            vuelve a estar activa y ya se puede confirmar el pago.</td></tr>
+    <tr><td><span class="kbd">Cancelar</span></td>
+        <td>El participante desistió o la solicitud era inválida.</td>
+        <td>Deja la reserva en estado cancelado; el carril y el coche se liberan.</td></tr>
+  </table>
+  <div class="callout warn">
+    <span class="ct">Órden correcto</span>
+    Solo confirma un pago si <strong>recibiste el dinero o el comprobante real</strong> por WhatsApp.
+    Una vez confirmada, la inscripción queda garantizada y ocupa uno de los seis lugares de la carrera.
+  </div>
+
+  <h2>6.6 Pestaña «Ajustes &amp; Historial»</h2>
+  <p><strong>Ajustes</strong> (se aplican al instante, sin reiniciar nada):</p>
+  <table class="t">
+    <tr><th style="width:40%">Ajuste</th><th>Para qué</th></tr>
+    <tr><td><strong>Número de WhatsApp</strong></td><td>Número del negocio (formato internacional sin <code>+</code>). Es el que recibe todas las solicitudes y comprobantes. Sin él, los botones de WhatsApp no funcionan.</td></tr>
+    <tr><td><strong>Cuota de inscripción</strong></td><td>El precio que se sugiere en el mensaje de WhatsApp ($0 oculta el precio).</td></tr>
+    <tr><td><strong>Expiración de solicitudes</strong></td><td>Minutos que un participante tiene para pagar antes de que expire su reserva.</td></tr>
+    <tr><td><strong>Frecuencias de actualización</strong></td><td>Segundos entre mensajes de refresco de pantallas (panel y <code>/stream</code>).</td></tr>
+  </table>
+  <p><strong>Historial (bitácora):</strong> registro cronológico de acciones críticas: inicios de sesión,
+  pagos confirmados, creaciones de carreras, cambios de ajustes, etc. Útil para auditar «quién hizo qué».</p>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 7. STREAM / OBS ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Transmisión</span><h1 class="sec">7. Pantalla en vivo (/stream) y OBS Studio</h1></div>
+
+  <p><code>/stream</code> es una página <strong>pública e independiente</strong>, sin controles administrativos
+  ni datos privados, diseñada como escena lista para la transmisión:</p>
+  <ul>
+    <li>Formato panorámico <strong>16:9</strong> con la marca ALANBREX.</li>
+    <li>Indicador <span class="pill red">EN VIVO</span> cuando hay carrera publicada, <span class="pill gray">EN ESPERA</span> cuando no, y <span class="pill amber">RECONECTANDO</span> si falla la red.</li>
+    <li>Número de carrera gigante (#N) y los <strong>seis carriles</strong> con participante y coche.</li>
+    <li>Cuando hay ganador: <strong>destacado especial</strong> con trofeo y brillo sobre el carril ganador, además del texto <em>«GANADOR: nombre — coche»</em>.</li>
+    <li>Pie con la <strong>próxima carrera</strong> abierta y el <strong>último ganador</strong> registrado.</li>
+  </ul>
+  <p>La pantalla <strong>se actualiza sola cada 2 segundos</strong>: al confirmar un pago en el panel, el
+  carril aparece ocupado en el stream sin recargar nada. Si la conexión falla, reintenta sola y muestra
+  el aviso «RECONECTANDO».</p>
+
+  <h2>7.1 Configurar la captura en OBS Studio</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div class="b">En OBS Studio, en <strong>Fuentes</strong>, pulsa <span class="kbd">+</span> y elige <strong>Navegador</strong>.</div></div>
+    <div class="step"><div class="n">2</div><div class="b">En <strong>URL</strong> escribe <code>https://tu-dominio.com/stream</code>.</div></div>
+    <div class="step"><div class="n">3</div><div class="b">Ancho <strong>1920</strong>, Alto <strong>1080</strong> (16:9), FPS <strong>30</strong>.</div></div>
+    <div class="step"><div class="n">4</div><div class="b">Activa <em>«Apagar fuente cuando no sea visible»</em> si lo deseas: al volver a mostrarla, la pantalla se recupera sola gracias al sondeo interno.</div></div>
+    <div class="step"><div class="n">5</div><div class="b">Muestra la fuente. El organizador desde el panel usa <span class="kbd">Mostrar en /stream</span> para elegir qué carrera sale al aire.</div></div>
+  </div>
+
+  <div class="callout tip">
+    <span class="ct">Guía de escena</span>
+    <ul style="margin-bottom:2pt">
+      <li><strong>Antes de la carrera:</strong> pública una carrera abierta: se ven los carriles llenarse en vivo — perfecto para promocionar.</li>
+      <li><strong>Durante:</strong> cambia a «en marcha» con <span class="kbd">Iniciar</span>.</li>
+      <li><strong>Ganador:</strong> al terminar, pulsa <span class="kbd">Registrar ganador</span>; el stream resalta a ganador y trofeo automáticamente.</li>
+      <li>Deja esta pantalla abierta todo el evento: no se desincroniza y no requiere sesión ni login.</li>
+    </ul>
+  </div>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 8. ESTADOS ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Referencia</span><h1 class="sec">8. Estados del sistema</h1></div>
+
+  <h2>8.1 Estado de una inscripción (reserva)</h2>
+  <table class="t">
+    <tr><th style="width:24%">Estado</th><th>Significado</th><th style="width:32%">Transiciones posibles</th></tr>
+    <tr><td><span class="pill amber">Pendiente de pago</span></td><td>Carril y coche apartados, esperando pago.</td><td>Confirmada (al pagar) &middot; Expirada (al vencer plazo) &middot; Cancelada</td></tr>
+    <tr><td><span class="pill green">Confirmada</span></td><td>Pago verificado por el organizador; lugar asegurado.</td><td>Terminal salvo corrección administrativa</td></tr>
+    <tr><td><span class="pill amber" style="color:#854d0e">Expirada</span></td><td>El plazo terminó sin pago.</td><td>Reactivada (si carril y coche siguen libres)</td></tr>
+    <tr><td><span class="pill red">Cancelada</span></td><td>Anulada por el organizador.</td><td>No se puede confirmar; se puede volver a inscribir</td></tr>
+  </table>
+  <p>Mientras una reserva está <strong>activa</strong> (pendiente de pago o confirmada), su carril y su coche
+  <strong>ya no se pueden escoger para esa carrera</strong> (aunque sí pueden reutilizarse en carreras
+  distintas). Al expirar o cancelarse la reserva, esos recursos vuelven a estar disponibles de inmediato
+  para la misma carrera.</p>
+
+  <h2>8.2 Estado de una carrera</h2>
+  <table class="t">
+    <tr><th style="width:24%">Estado</th><th>Significado</th><th style="width:32%">Acciones de panel disponibles</th></tr>
+    <tr><td><span class="pill green">Abierta</span></td><td>Acepta inscripciones públicas (carriles libres).</td><td>Iniciar &middot; Mostrar en /stream &middot; Cancelar</td></tr>
+    <tr><td><span class="pill blue">En marcha</span></td><td>Corriendo en este momento; no acepta más inscripciones.</td><td>Finalizar &middot; Cancelar</td></tr>
+    <tr><td><span class="pill gray">Finalizada</span></td><td>Terminó; queda nombrar al ganador.</td><td>Registrar ganador &middot; Reabrir &middot; Mostrar en /stream</td></tr>
+    <tr><td><span class="pill red">Cancelada</span></td><td>Anulada; liberó carriles/coches.</td><td>—</td></tr>
+  </table>
+
+  <h2>8.3 Estado de una jornada</h2>
+  <table class="t">
+    <tr><th style="width:24%">Estado</th><th>Significado</th></tr>
+    <tr><td><strong>Actual</strong></td><td>La jornada que se publica al público y en el stream. Solo una a la vez.</td></tr>
+    <tr><td><strong>Cerrada</strong></td><td>Ya no se publica pero conserva su información.</td></tr>
+    <tr><td><strong>Archivada</strong></td><td>Histórica, ordenada para consulta.</td></tr>
+  </table>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 9. REGLAS ============ -->
+<div>
+  <div class="pagehead"><span class="kick">Referencia</span><h1 class="sec">9. Reglas que debes conocer</h1></div>
+
+  <ul>
+    <li><strong>Seis carriles por carrera:</strong> cada carrera siempre compite en pista de 6; solo se
+        confirmarán <span style="font-weight:700">máximo 6 inscripciones</span> por carrera.</li>
+    <li><strong>Un carril y un coche por carrera:</strong> la regla exacta es que <strong>el carril y el
+        automóvil que ya se encuentran pagados o en pago pendiente ya no se pueden escoger para esa
+        carrera</strong> — ni por otras personas ni de nuevo por el mismo participante. El bloqueo se aplica
+        en la base de datos, así que rige incluso si dos personas intentan inscribirse al mismo tiempo desde
+        dispositivos distintos. Al expirar o cancelarse la solicitud, el carril y el coche quedan libres
+        de nuevo; en carreras distintas de la jornada sí pueden reutilizarse.</li>
+    <li><strong>Carril apartado, no regala:</strong> al enviar la solicitud tu carril se aparta en
+        acta; si el pago no llega dentro del plazo configurado, se libera automáticamente.</li>
+    <li><strong>El ganador debe estar confirmado:</strong> solo se puede registrar como ganador a un
+        participante cuyo pago esté confirmado.</li>
+    <li><strong>El ganador se puede corregir:</strong> usa <span class="kbd">Quitar ganador</span> y
+        regístralo de nuevo; el resultado se conserva aunque se recargue el navegador.</li>
+    <li><strong>Siguiente carrera automática:</strong> al completarse los seis pagos de una carrera (o al
+        registrar su ganador) la siguiente se habilita sola.</li>
+    <li><strong>Privacidad:</strong> las pantallas públicas <strong>nunca muestran datos de contacto</strong>
+        de los participantes (teléfono, etc.). Esos datos solo los ve el organizador en el panel.</li>
+    <li><strong>Más carreras pendientes:</strong> los eventos y carreras pasadas quedan guardados para
+        consulta; actualizar el sistema no borra datos (<span style="font-style:italic">corredores seguras</span>).</li>
+  </ul>
+
+  <h2>9.1 Checklist de arranque del evento (para el organizador)</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div class="b">Ajusta <strong>Número de WhatsApp</strong>, <strong>Cuota</strong> y <strong>Expiración</strong> en <em>Ajustes</em>.</div></div>
+    <div class="step"><div class="n">2</div><div class="b">Verifica que la flota de <strong>Coches</strong> esté completa y con fotos.</div></div>
+    <div class="step"><div class="n">3</div><div class="b">Crea (o marca como actual) la <strong>Jornada</strong> del día.</div></div>
+    <div class="step"><div class="n">4</div><div class="b">Crea la <strong>Carrera 1</strong> y presiona <span class="kbd">Mostrar en /stream</span> si va a transmitirse.</div></div>
+    <div class="step"><div class="n">5</div><div class="b">Comprueba <code>https://tu-dominio.com/</code> desde el celular: la carrera se ve con sus carriles libres.</div></div>
+    <div class="step"><div class="n">6</div><div class="b">Publica la inscripción en redes, vigila el panel <em>Resumen</em> y confirma pagos conforme llegan.</div></div>
+  </div>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 10. PROBLEMAS ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Soporte</span><h1 class="sec">10. Problemas frecuentes y su solución</h1></div>
+
+  <table class="t">
+    <tr><th style="width:34%">Síntoma</th><th style="width:30%">Causa probable</th><th>Solución</th></tr>
+    <tr><td>El botón <em>«Enviar comprobante por WhatsApp»</em> no aparece o no hace nada</td>
+        <td>El <strong>Número de WhatsApp</strong> del negocio no está configurado.</td>
+        <td>El organizador lo define en <em>Ajustes</em> (formato internacional sin <code>+</code>).</td></tr>
+    <tr><td>No se puede elegir un carril aunque «parece libre»</td>
+        <td>Otro participante lo apartó hace menos de unos segundos; la pantalla aún no refrescaba.</td>
+        <td>Espera unos segundos y recarga. El sistema nunca permite doble reserva del carril.</td></tr>
+    <tr><td>Mi reserva muestra <span class="pill amber" style="color:#854d0e">EXPIRADA</span> pero yo ya pagué</td>
+        <td>El comprobante llegó después del plazo.</td>
+        <td>Pide al organizador <span class="kbd">Reactivar</span> tu inscripción y luego su <span class="kbd">Confirmar pago</span>.</td></tr>
+    <tr><td>El carril que pagué aparece ocupado por otra persona</td>
+        <td>Confusión de carriles en la conversación de WhatsApp</td>
+        <td>Comparte tu <strong>Referencia</strong> (8 caracteres) de la página de estado con el organizador; él la localiza al instante en <em>Inscripciones</em>.</td></tr>
+    <tr><td>En el panel una acción falla con error de seguridad (403)</td>
+        <td>Token de seguridad de la pestaña expirado tras horas abiertas.</td>
+        <td><strong>Recarga la página del panel</strong> y reintenta. Si pide login, vuelve a entrar.</td></tr>
+    <tr><td><code>/stream</code> muestra «RECONECTANDO» o «RECONECTANDO» muy seguido</td>
+        <td>API temporalmente sin servicio o mala red de la computadora de OBS.</td>
+        <td>Verifica <code>/api/health</code> y los logs del panel de hosting; la pantalla se recupera sola al volver la conexión.</td></tr>
+    <tr><td>El stream no muestra ninguna carrera («Esperando carrera»)</td>
+        <td>Nadie seʟeccionó carrera al aire.</td>
+        <td>En <em>Carreras</em> usa el botón <span class="kbd">Mostrar en /stream</span> de la carrera deseada.</td></tr>
+    <tr><td>Confirmé un pago y el panel no lo refleja</td>
+        <td>Refresco en marcha o cesa del navegador.</td>
+        <td>Espera el refresco automático (3–5 s) o recarga la pestaña. La confirmación es idempotente: no se duplica aunque pulses dos veces.</td></tr>
+    <tr><td>No puedo elegir el coche que quiero</td>
+        <td>El coche ya tiene una reserva activa (pago pendiente o ya pagado) en <strong>esa misma carrera</strong>, o está desactivado por el organizador.</td>
+        <td>Elige otro coche disponible en esa carrera. El coche ocupado sí puede usarse en otras carreras; o pide al organizador liberar la inscripción que lo ocupa (cancelándola).</td></tr>
+  </table>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 11. FAQ ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Soporte</span><h1 class="sec">11. Preguntas frecuentes</h1></div>
+
+  <h3>¿Necesito crear una cuenta para inscribirme?</h3>
+  <p>No. La inscripción solo pide nombre, WhatsApp de contacto, carril y coche. Lo importante que
+  recibes es tu <strong>enlace personal de estado</strong> (<code>/status/&lt;token&gt;</code>), guárdalo.</p>
+
+  <h3>¿Cómo pago? ¿Hay tarjeta en línea?</h3>
+  <p>No hay pagos electrónicos automáticos. El sistema envía por WhatsApp la solicitud con la cuota
+  sugerida; ustedes coordinar el pago con el organizador (efectivo, transferencia, etc.) y él confirmará
+  tu lugar al recibir el comprobante.</p>
+
+  <h3>¿Cuánto tiempo tengo para pagar?</h3>
+  <p>El organizador define el plazo (predeterminado: 30 minutos). Tu página de estado muestra una
+  <strong>cuenta regresiva</strong> mientras estás pendiente, y el organizador puede ampliarla con
+  <span class="kbd">Extender</span>.</p>
+
+  <h3>¿Puedo cambiar de carril o de coche después de inscribirme?</h3>
+  <p>Ya no por la página pública: escríbale al organizador. Él puede cancelar tu reserva para que te
+  inscribas de nuevo en el carril/coche correctos, o hacer ajustes desde el panel.</p>
+
+  <h3>¿Se pueden inscribir dos personas en el mismo carril?</h3>
+  <p>No. El sistema bloquea el carril y el coche a nivel de base de datos <strong>dentro de cada carrera</strong>:
+  si el carril o el coche ya tienen una reserva pagada o pendiente de pago, no se pueden escoger para esa
+  carrera. Si dos personas compiten por el mismo recurso, la que envió primero su solicitud lo obtiene y la
+  otra recibirá un aviso (p. ej. «El carril acaba de ser ocupado; elige otro» o «Ese coche ya está reservado
+  en esta carrera»). El mismo carril o coche sí puede reservarse en otras carreras.</p>
+
+  <h3>¿Qué se ve en la transmisión?</h3>
+  <p>Solo información deportiva: número de carrera, seis carriles con nombre del participante y coche,
+  estado, ganador y próxima carrera. <strong>No se muestran teléfonos ni datos de pago.</strong></p>
+
+  <h3>Hecho el pago ¿cuándo se ve ahí «confirmado»?</h3>
+  <p>En el momento en que el organizador pulsa <span class="kbd">Confirmar pago</span>. Tu página de estado
+  (<code>/status</code>) y el stream se actualizan solos en unos segundos.</p>
+
+  <h3>Perdí el enlace de mi reserva</h3>
+  <p>Pide al organizador que te lo comparta de nuevo desde la pestaña <em>Inscripciones</em> o dile tu
+  <strong>Referencia</strong> (las primeras 8 letras del token mostradas en tu página; si se la diste, es tu llave).</p>
+
+  <h3>¿El organizador puede trabajar varias personas a la vez?</h3>
+  <p>Sí. Varios sesiones de administrador pueden tener el panel abierto a la vez; el panel refresca
+  automáticamente y las operaciones críticas están protegidas para que un mismo pago no se confirme
+  dos veces.</p>
+
+  <h3>¿Qué pasa si un participante no se presenta?</h3>
+  <p>El organizador puede <strong>cancelar</strong> su inscripción desde el panel; el carril y el coche
+  quedan libres para otra persona, salvo la deuda si existía.</p>
+  <div class="footer-brand"><span>Carreras Hot Wheels</span><span>ALANBREX &middot; Manual de usuario</span></div>
+</div>
+
+<!-- ============ 12. GLOSARIO ============ -->
+<div class="pagebreak">
+  <div class="pagehead"><span class="kick">Referencia</span><h1 class="sec">12. Glosario</h1></div>
+
+  <table class="t">
+    <tr><th style="width:28%">Término</th><th>Definición</th></tr>
+    <tr><td><strong>Jornada</strong></td><td>Evento de un día o fin de semana que agrupa varias carreras. Solo la jornada «actual» se publica al público.</td></tr>
+    <tr><td><strong>Carrera</strong></td><td>Competencia individual de seis coches (uno por carril), numerada automáticamente dentro de su jornada.</td></tr>
+    <tr><td><strong>Carril</strong></td><td>Uno de los seis lugares de la pista de competición (1 al 6).</td></tr>
+    <tr><td><strong>Reserva / Inscripción</strong></td><td>Solicitud de un participante por un carril, un coche y una carrera, con su estado de pago.</td></tr>
+    <tr><td><strong>Token / Referencia</strong></td><td>Código único que identifica tu reserva y protege tu enlace de estado (se muestra en 8 caracteres como «Referencia»).</td></tr>
+    <tr><td><strong>Expiración</strong></td><td>Tiempo máximo que una reserva pendiente de pago conserva su carril apartado.</td></tr>
+    <tr><td><strong>Confirmación de pago</strong></td><td>Acción del organizador que garantiza el lugar del participante, registrando método, monto y referencia.</td></tr>
+    <tr><td><strong>Panel (/admin)</strong></td><td>Zona privada del organizador con pestañas Resumen, Jornadas, Carreras, Coches, Inscripciones y Ajustes &amp; Historial.</td></tr>
+    <tr><td><strong>Stream (/stream)</strong></td><td>Pantalla pública 16:9 para capturar en OBS Studio y mostrar la carrera en vivo.</td></tr>
+    <tr><td><strong>Polling</strong></td><td>Sistema por el que las pantallas se actualizan solas consultando nuevos datos cada pocos segundos.</td></tr>
+    <tr><td><strong>Bitácora / Historial</strong></td><td>Registro de acciones críticas del sistema (pagos, carreras, ajustes, sesiones) para auditoría.</td></tr>
+    <tr><td><strong>OBS Studio</strong></td><td>Software gratuito de transmisión en el que se añade la fuente «Navegador» con la dirección del stream.</td></tr>
+  </table>
+
+  <h2>Soporte</h2>
+  <p>Para dudas de operación del sistema o incidencias, contacta al administrador de la plataforma
+  ALANBREX por los canales definidos en tu organización. Para todo lo relativo a pagos y carreras,
+  el contacto directo es el <strong>número de WhatsApp del negocio configurado en Ajustes</strong>.</p>
+
+  <div class="callout tip">
+    <span class="ct">Resumen en una línea</span>
+    El participante reserva su carril por <code>/</code>, paga por WhatsApp, espera la confirmación;
+    el organizador administra todo desde <code>/admin</code>; el público lo disfruta en <code>/stream</code>.
+  </div>
+  <div class="footer-brand"><span>Fin del manual — Carreras Hot Wheels</span><span>ALANBREX &middot; Octubre 2026</span></div>
+</div>
+
+</body>
+</html>
