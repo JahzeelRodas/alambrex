@@ -419,9 +419,17 @@ export default function HomePage() {
       <footer className="relative z-10 border-t border-line bg-void/80">
         <div className="mx-auto max-w-6xl px-4 py-6 flex flex-wrap items-center justify-between gap-4">
           <Brand size="sm" />
-          <div className="font-tech text-xs text-ash/70">
-            Seis carriles · Un ganador · Powered by ALANBREX STREAM
-          </div>
+<div className="font-tech text-xs text-ash/70">
+  Seis carriles · Un ganador · Potenciado por{" "}
+  <a
+    href="https://www.rovelbots.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline hover:text-ash transition-colors font-semibold"
+  >
+    Rovelbots
+  </a>
+</div>
         </div>
       </footer>
     </div>
