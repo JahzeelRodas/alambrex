@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { usePolling } from '../hooks/usePolling';
-import CircuitBackground from '../components/CircuitBackground';
 import LaneRow from '../components/LaneRow';
 import { IconTrophy } from '../components/Neon';
 import type { StreamPayload } from '../types/api';
@@ -9,13 +8,21 @@ import type { StreamPayload } from '../types/api';
 export default function StreamPage() {
   const [now, setNow] = useState(Date.now());
 
+  // Reloj sincronizado mediante requestAnimationFrame para OBS
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
+    let animationFrameId: number;
+
+    const updateTime = () => {
+      setNow(Date.now());
+      animationFrameId = requestAnimationFrame(updateTime);
+    };
+
+    animationFrameId = requestAnimationFrame(updateTime);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
   const applyData = useCallback((prev: StreamPayload | null, next: StreamPayload): StreamPayload => {
-
     if (prev && prev.version === next.version) return prev;
     return next;
   }, []);
@@ -23,7 +30,6 @@ export default function StreamPage() {
   const [pollMs, setPollMs] = useState(2000);
   const { data, connected, error } = usePolling(api.getStream, pollMs, { applyData });
   const results = usePolling(api.getResults, 15000);
-
 
   useEffect(() => {
     if (data?.pollMs && data.pollMs !== pollMs) setPollMs(data.pollMs);
@@ -36,126 +42,147 @@ export default function StreamPage() {
       : null;
   const lastResult = results.data?.results?.[0] ?? null;
 
-  return (
-    <div className="relative min-h-screen bg-void">
-      <CircuitBackground fixed={false} />
+  const isLive = connected && race;
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1800px] flex-col gap-4 px-6 py-5 xl:px-10">
-        {/* Cabecera: jornada + LIVE + reloj */}
-        <header className="flex items-center justify-between gap-6 border-b border-neon/25 pb-3">
-          <div className="min-w-0">
-            <div className="font-mono text-neon/70 text-xs tracking-[0.35em] uppercase">
-              Alanbrex Stream
+  return (
+    // Fondo Fucsia (#FF00FF) para Chroma Key limpio en OBS
+    <div className="relative min-h-screen bg-[#FF00FF] overflow-hidden select-none flex justify-end">
+      
+      {/* Contenedor principal posicionado a la derecha en formato columna (Ancho fijo de ~520px) */}
+      <div className="relative z-10 w-full max-w-[520px] flex flex-col h-screen justify-between p-4 gap-3 bg-black/40 backdrop-blur-[2px]">
+        
+        {/* Cabecera compacta: Evento, Estado y Reloj */}
+        <header className="flex flex-col gap-2 bg-black border-2 border-neon p-4 rounded-2xl shadow-2xl">
+          <div className="flex items-center justify-between">
+            <div className="font-mono text-neon text-[10px] tracking-[0.3em] uppercase font-black">
+              Alanbrex Racing Live
             </div>
-            <div className="font-display font-black italic text-2xl md:text-4xl text-silver truncate">
+            
+            {/* Etiqueta EN VIVO 100% Sólida y Opaca */}
+            <div className={`px-3 py-1 rounded-lg flex items-center gap-2 text-xs font-black uppercase tracking-wider bg-zinc-950 border-2 shadow-2xl ${
+              isLive ? 'text-red-500 border-red-600' : 'text-neon border-neon'
+            }`}>
+              <span className={`w-2.5 h-2.5 rounded-full ${isLive ? 'bg-red-500 animate-pulse' : 'bg-neon'}`} />
+              <span className="text-white">
+                {connected ? (race ? 'EN VIVO' : 'EN ESPERA') : 'RECONECTANDO'}
+              </span>
+            </div>
+
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="font-display font-black italic text-xl text-white truncate">
               {data?.event?.name ?? 'CARRERAS HOT WHEELS'}
             </div>
-          </div>
-          <div className="flex items-center gap-4 shrink-0">
-            <span
-              className={`pill border ${
-                connected && race
-                  ? 'border-red-500/60 text-red-400 bg-red-500/10'
-                  : 'border-ash/40 text-ash bg-ash/10'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  connected && race ? 'bg-red-500 animate-pulse-live' : 'bg-ash'
-                }`}
-              />
-              {connected ? (race ? 'EN VIVO' : 'EN ESPERA') : 'RECONECTANDO'}
-            </span>
-            <span className="hidden md:block font-mono text-2xl text-neon text-glow-soft">
+            <span className="font-mono text-xl text-neon font-black bg-zinc-900 px-3 py-1 rounded-lg border border-neon/50">
               {new Date(now).toLocaleTimeString('es-MX', { hour12: false })}
             </span>
           </div>
         </header>
 
-        {/* Cuerpo */}
+        {/* Cuerpo principal */}
         {!race ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="font-mono text-neon/60 tracking-[0.4em] text-sm uppercase">
-                Esperando carrera
+            <div className="text-center bg-black p-8 rounded-2xl border-2 border-neon shadow-2xl">
+              <div className="font-mono text-neon tracking-[0.3em] text-xs uppercase font-black animate-pulse">
+                Sistemas en Espera
               </div>
-              <p className="mt-3 font-tech text-ash text-xl">
-                El organizador aún no ha seleccionado la carrera a transmitir.
+              <p className="mt-3 font-tech text-white text-lg font-bold">
+                El organizador aún no ha seleccionado la carrera.
               </p>
-              {error && <p className="mt-2 font-tech text-sm text-red-400">{error}</p>}
+              {error && <p className="mt-2 font-tech text-xs text-red-400 font-bold">{error}</p>}
             </div>
           </div>
         ) : (
-          <>
-            {/* Franja de carrera */}
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div className="flex items-baseline gap-4">
-                <span className="font-mono text-neon/70 text-sm tracking-[0.3em] uppercase">
-                  Carrera
+          <div className="flex-1 flex flex-col gap-3 justify-center">
+            
+            {/* Tarjeta de Número de Carrera y Ganador */}
+            <div className="bg-black px-5 py-3 rounded-2xl border-2 border-zinc-700 shadow-2xl flex items-center justify-between">
+              <div>
+                <span className="font-mono text-neon text-[10px] tracking-[0.3em] uppercase font-black block">
+                  Grilla Oficial
                 </span>
-                <span className="font-display font-black italic text-5xl md:text-7xl text-silver skew-racing leading-none">
+                <span className="font-display font-black italic text-4xl text-white skew-racing leading-none">
                   #{race.raceNumber}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div>
                 {winner && race.winnerLane !== null && (
-                  <span className="pill bg-neon text-void shadow-neon text-sm !px-4 !py-1.5">
-                    <IconTrophy className="w-4 h-4" />
-                    GANADOR: {winner.participantName} — {winner.carName}
+                  <span className="bg-neon text-black text-xs font-black px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-lg">
+                    <IconTrophy className="w-4 h-4 text-black" />
+                    GANADOR: C-{winner.lane}
                   </span>
                 )}
                 {!winner && (
-                  <span className="font-mono text-ash text-sm">
-                    CARRILES LIBRES: <span className="text-neon">{race.freeLanes}</span>
+                  <span className="font-mono text-white text-xs font-bold bg-zinc-900 px-3 py-2 rounded-xl border border-zinc-700">
+                    LIBRES: <span className="text-neon font-black">{race.freeLanes}</span>
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Los seis carriles */}
-            <div className="flex-1 flex flex-col justify-center gap-3">
+            {/* Listado vertical de los 6 carriles */}
+            <div className="flex flex-col gap-2 bg-black/95 p-3.5 rounded-2xl border-2 border-neon/50 shadow-2xl">
               {race.lanes.map((laneData) => (
-                <LaneRow
-                  key={laneData.lane}
-                  data={laneData}
-                  variant="stream"
-                  isWinnerLane={race.winnerLane === laneData.lane}
-                />
+                <div 
+                  key={laneData.lane} 
+                  className={`px-3 py-2 rounded-xl border transition-all ${
+                    race.winnerLane === laneData.lane 
+                      ? 'bg-neon/20 border-neon shadow-neon-sm' 
+                      : 'bg-zinc-900/90 border-zinc-800'
+                  }`}
+                >
+                  <LaneRow
+                    data={laneData}
+                    variant="stream"
+                    isWinnerLane={race.winnerLane === laneData.lane}
+                  />
+                </div>
               ))}
             </div>
 
-            {/* Pie: próxima carrera + últimos resultados + marca */}
-            <footer className="flex items-center justify-between gap-4 border-t border-neon/25 pt-3">
-              <div className="font-tech text-ash text-sm md:text-base">
-                {data?.nextRace ? (
-                  <>
-                    <span className="text-ash/70">PRÓXIMA: </span>
-                    <span className="text-silver font-bold">CARRERA #{data.nextRace.raceNumber}</span>
-                    <span className="text-ash/70"> · {data.nextRace.freeLanes} carriles libres</span>
-                  </>
-                ) : (
-                  <span className="text-ash/70">Sin próximas carreras abiertas</span>
-                )}
-              </div>
-              <div className="hidden md:block font-tech text-ash/70 text-sm truncate max-w-[420px]">
-                {lastResult ? (
-                  <>
-                    <span className="text-neon">★ </span>
-                    ÚLTIMO GANADOR: {lastResult.participantName} ({lastResult.carName})
-                  </>
-                ) : (
-                  '—'
-                )}
-              </div>
+          </div>
+        )}
+
+        {/* Pie de página vertical compacto */}
+        <footer className="flex flex-col gap-2 bg-black px-4 py-3 rounded-2xl border-t-4 border-neon shadow-2xl">
+          <div className="font-tech text-white font-bold text-xs flex justify-between items-center">
+            {data?.nextRace ? (
+              <>
+                <span><strong className="text-neon">PRÓXIMA:</strong> #{data.nextRace.raceNumber}</span>
+                <span className="text-zinc-400">({data.nextRace.freeLanes} libres)</span>
+              </>
+            ) : (
+              <span className="text-zinc-500">Sin próximas carreras</span>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between border-t border-zinc-800 pt-2">
+            <div className="font-tech text-zinc-300 font-semibold text-xs truncate max-w-[340px]">
+              {lastResult ? (
+                <>
+                  <span className="text-neon font-black">★ </span>
+                  {lastResult.participantName} ({lastResult.carName})
+                </>
+              ) : (
+                <span className="text-zinc-500">Sin resultados previos</span>
+              )}
+            </div>
+            <a 
+              href="https://www.rovelbots.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="shrink-0"
+            >
               <img
                 src="/branding/logo-mascot.jpg"
-                alt="ALANBREX"
-                className="w-14 h-14 rounded-lg object-cover border border-neon/40 shadow-neon-sm mix-blend-screen opacity-90"
+                alt="ROVELBOTS"
+                className="w-9 h-9 rounded-lg object-cover border border-neon"
                 draggable={false}
               />
-            </footer>
-          </>
-        )}
+            </a>
+          </div>
+        </footer>
+
       </div>
     </div>
   );
