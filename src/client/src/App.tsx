@@ -4,6 +4,7 @@ import StatusPage from './pages/StatusPage';
 import StreamPage from './pages/StreamPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import SpectatorPage from './pages/SpectatorPage';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={<AdminDashboardPage />} />
       <Route path="*" element={<HomePage />} />
+      <Route path="/live" element={<SpectatorPage />} />
     </Routes>
   );
 }
