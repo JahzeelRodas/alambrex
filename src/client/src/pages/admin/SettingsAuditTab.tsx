@@ -4,6 +4,7 @@ import { usePolling } from '../../hooks/usePolling';
 import type { AdminSettings } from '../../types/api';
 
 const FIELDS: { key: keyof AdminSettings; apiKey: string; label: string; hint: string }[] = [
+  { key: 'streamUrl', apiKey: 'stream_url', label: 'URL de Transmisión en Vivo', hint: 'Enlace de YouTube o Twitch (ej. https://www.youtube.com/watch?v=ID)' },
   { key: 'whatsappNumber', apiKey: 'whatsapp_number', label: 'WhatsApp del negocio', hint: 'Formato internacional sin + (ej. 5215512345678)' },
   { key: 'entryPrice', apiKey: 'entry_price', label: 'Cuota de inscripción', hint: 'Se muestra al público y se sugiere en el pago' },
   { key: 'reservationExpiryMinutes', apiKey: 'reservation_expiry_minutes', label: 'Expiración de solicitudes (min)', hint: 'Plazo para pagar antes de liberar el carril' },

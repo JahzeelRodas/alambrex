@@ -7,7 +7,7 @@ interface CarCardProps {
   onClick?: () => void;
 }
 
-/** Tarjeta de coche para la selección del participante. */
+
 export default function CarCard({ car, selected = false, disabled = false, onClick }: CarCardProps) {
   const selectable = Boolean(onClick) && !disabled;
 

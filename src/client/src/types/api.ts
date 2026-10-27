@@ -1,5 +1,3 @@
-
-
 export type ReservationStatus = 'pending_payment' | 'confirmed' | 'expired' | 'cancelled';
 export type RaceStatus = 'pending' | 'open' | 'running' | 'finished' | 'cancelled';
 
@@ -46,7 +44,7 @@ export interface PublicEventData {
 }
 
 export interface StreamPayload {
-  event: { id: number; name: string } | null;
+  event: { id: number; name: string; streamUrl?: string } | null;
   race: RaceSummary | null;
   nextRace: { id: number; raceNumber: number; freeLanes: number } | null;
   version: string;
@@ -156,6 +154,7 @@ export interface DashboardData {
     streamPollMs: number;
     adminPollMs: number;
     availabilityPollMs: number;
+    streamUrl?: string;
   };
   audit: AuditRow[];
 }
@@ -167,6 +166,7 @@ export interface AdminSettings {
   streamPollMs: number;
   adminPollMs: number;
   availabilityPollMs: number;
+  streamUrl?: string;
 }
 
 export interface AdminMe {

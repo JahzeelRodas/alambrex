@@ -63,6 +63,13 @@ publicRouter.get(
     const id = Number(req.params.id);
     const payload = await races.buildStreamPayload(id);
     if (!payload) throw new ApiError(404, 'NO_RACE', 'No hay carrera disponible');
+    
+
+    const settings = await getSettings();
+    if (payload.event) {
+      (payload.event as any).streamUrl = settings.streamUrl;
+    }
+
     res.json(payload);
   })
 );
@@ -71,11 +78,23 @@ publicRouter.get(
 publicRouter.get(
   '/stream',
   asyncHandler(async (_req, res) => {
-    const payload = await races.buildStreamPayload();
+    const [payload, settings] = await Promise.all([races.buildStreamPayload(), getSettings()]);
     if (!payload) {
-      res.json({ event: null, race: null, nextRace: null, version: 'empty', pollMs: 4000 });
+      res.json({ 
+        event: { id: 0, name: '', streamUrl: settings.streamUrl }, 
+        race: null, 
+        nextRace: null, 
+        version: 'empty', 
+        pollMs: 4000 
+      });
       return;
     }
+    
+
+    if (payload.event) {
+      (payload.event as any).streamUrl = settings.streamUrl;
+    }
+
     res.json(payload);
   })
 );

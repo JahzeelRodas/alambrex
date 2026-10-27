@@ -4,7 +4,7 @@ import * as results from './service';
 
 export const resultsRouter = Router();
 
-/** Últimos ganadores registrados (público). */
+
 resultsRouter.get(
   '/',
   asyncHandler(async (req, res) => {

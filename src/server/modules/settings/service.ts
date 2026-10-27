@@ -8,6 +8,7 @@ const KEYS = [
   'stream_poll_ms',
   'admin_poll_ms',
   'availability_poll_ms',
+  'stream_url',
 ] as const;
 
 export type SettingKey = (typeof KEYS)[number];
@@ -19,6 +20,7 @@ export type AppSettings = {
   streamPollMs: number;
   adminPollMs: number;
   availabilityPollMs: number;
+  streamUrl?: string;
 };
 
 interface CacheEntry {
@@ -37,6 +39,7 @@ function defaults(): AppSettings {
     streamPollMs: 2000,
     adminPollMs: 4000,
     availabilityPollMs: 5000,
+    streamUrl: '',
   };
 }
 
@@ -55,6 +58,7 @@ export async function getSettings(force = false): Promise<AppSettings> {
     streamPollMs: toInt(map.get('stream_poll_ms'), base.streamPollMs),
     adminPollMs: toInt(map.get('admin_poll_ms'), base.adminPollMs),
     availabilityPollMs: toInt(map.get('availability_poll_ms'), base.availabilityPollMs),
+    streamUrl: map.get('stream_url')?.trim() || base.streamUrl,
   };
 
   cache = { at: Date.now(), settings };

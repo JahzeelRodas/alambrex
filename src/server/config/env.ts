@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'node:path';
 
-// Carga .env desde el directorio de trabajo (desarrollo). En Hostinger las
-// variables se definen en el panel de la aplicación Node.js.
+
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 function str(value: string | undefined, fallback: string): string {

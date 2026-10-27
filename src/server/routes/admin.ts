@@ -20,6 +20,7 @@ const settingSchema = z.object({
     'stream_poll_ms',
     'admin_poll_ms',
     'availability_poll_ms',
+    'stream_url',
   ]),
   value: z.string().min(1).max(500),
 });

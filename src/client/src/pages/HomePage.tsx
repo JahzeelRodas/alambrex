@@ -119,7 +119,7 @@ export default function HomePage() {
             <a href="#carreras" className="btn-ghost !px-3 !py-1.5 text-xs">
               Carreras
             </a>
-            <Link to="/stream" className="btn-ghost !px-3 !py-1.5 text-xs">
+            <Link to="/live" className="btn-ghost !px-3 !py-1.5 text-xs">
               En vivo
             </Link>
             <Link to="/admin" className="btn-ghost !px-3 !py-1.5 text-xs">

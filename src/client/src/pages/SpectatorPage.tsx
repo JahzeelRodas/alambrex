@@ -5,6 +5,15 @@ import LaneRow from '../components/LaneRow';
 import { IconTrophy } from '../components/Neon';
 import type { StreamPayload } from '../types/api';
 
+function getEmbedUrl(rawUrl?: string | null): string | null {
+  if (!rawUrl) return null;
+  const match = rawUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (match && match[1]) {
+    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1`;
+  }
+  return rawUrl;
+}
+
 export default function SpectatorPage() {
   const [now, setNow] = useState(Date.now());
 
@@ -33,29 +42,38 @@ export default function SpectatorPage() {
       : null;
   const lastResult = results.data?.results?.[0] ?? null;
   const isLive = connected && race;
+  const streamUrl = data?.event?.streamUrl;
 
   return (
-
     <div className="min-h-screen w-full bg-zinc-950 text-white select-none flex flex-col xl:flex-row p-3 gap-3 box-border overflow-x-hidden">
       
-
+      {/* SECCIÓN IZQUIERDA: Reproductor de Video en Vivo dinámico */}
       <div className="w-full xl:flex-1 flex flex-col justify-center items-center my-auto">
         <div className="w-full max-w-6xl aspect-video bg-black rounded-2xl border-2 border-neon/40 shadow-2xl overflow-hidden flex flex-col items-center justify-center relative">
           
-          
-          {/* <iframe className="w-full h-full" src="https://www.youtube.com/embed/TU_ID" allowFullScreen /> */}
-          
-          <div className="text-center p-6">
-            <div className="font-display font-black italic text-3xl text-neon mb-2">
-              TRANSMISIÓN EN VIVO
+          {streamUrl ? (
+            <iframe
+              className="w-full h-full border-0"
+              src={getEmbedUrl(streamUrl) ?? ''}
+              title="Transmisión en Vivo Hot Wheels"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="text-center p-6">
+              <div className="font-display font-black italic text-3xl text-neon mb-2">
+                TRANSMISIÓN EN VIVO
+              </div>
+              <p className="font-tech text-zinc-400 text-sm">
+                Espacio para el reproductor de video de la competencia Hot Wheels.
+              </p>
             </div>
-            <p className="font-tech text-zinc-400 text-sm">
-              Espacio para el reproductor de video de la competencia Hot Wheels.
-            </p>
-          </div>
+          )}
+
         </div>
       </div>
 
+      {/* SECCIÓN DERECHA: Panel lateral */}
       <div className="w-full xl:w-[480px] flex flex-col h-auto xl:h-[calc(100vh-1.5rem)] justify-between gap-2 bg-zinc-900/60 backdrop-blur-md p-3 rounded-2xl border border-zinc-800">
         
         {/* Cabecera */}
@@ -124,7 +142,7 @@ export default function SpectatorPage() {
               </div>
             </div>
 
-
+            {/* Listado de los 6 carriles */}
             <div className="flex flex-col gap-1.5 bg-black/95 p-2.5 rounded-xl border-2 border-neon/50 shadow-xl overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
               {race.lanes.map((laneData) => (
                 <div 
@@ -146,7 +164,6 @@ export default function SpectatorPage() {
 
           </div>
         )}
-
 
         <footer className="flex flex-col gap-1.5 bg-black px-3 py-2.5 rounded-xl border-t-2 border-neon shadow-xl shrink-0">
           <div className="font-tech text-white font-bold text-[11px] flex justify-between items-center">
