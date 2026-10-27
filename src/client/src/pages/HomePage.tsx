@@ -154,7 +154,7 @@ export default function HomePage() {
               <a href="#carreras" className="btn-neon">
                 Inscríbete ahora
               </a>
-              <Link to="/stream" className="btn-outline">
+              <Link to="/live" className="btn-outline">
                 Ver en vivo
               </Link>
             </div>
