@@ -9,7 +9,7 @@ function getEmbedUrl(rawUrl?: string | null): string | null {
   if (!rawUrl) return null;
   const match = rawUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
   if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1`;
+    return `https://www.youtube-nocookie.com/embed/${match[1]}?autoplay=1&mute=1&enablejsapi=1`;
   }
   return rawUrl;
 }
@@ -56,7 +56,8 @@ export default function SpectatorPage() {
               className="w-full h-full border-0"
               src={getEmbedUrl(streamUrl) ?? ''}
               title="Transmisión en Vivo Hot Wheels"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
           ) : (
