@@ -429,7 +429,9 @@ export default function HomePage() {
                     </div>
                     <div className="font-tech text-xs text-ash/70 mt-1">
                       <span>
+                        {/* 
                         {ev.racesTotal} {ev.racesTotal === 1 ? 'carrera' : 'carreras'} ·{' '}
+                        */}
                         {ev.winnersTotal} {ev.winnersTotal === 1 ? 'ganador' : 'ganadores'}
                       </span>
                       {ev.lastWinAt && (
