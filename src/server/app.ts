@@ -26,11 +26,12 @@ export function createApp(): express.Express {
   );
 
   // La subida de imágenes viaja como JSON base64 y necesita un límite mayor que
-  // el habitual: se aplica solo a esa ruta y no muta el límite global.
+  // el habitual: se aplica solo a esas rutas y no muta el límite global.
   const slimJson = express.json({ limit: '100kb' });
   const imageJson = express.json({ limit: '4mb' });
+  const imagePaths = new Set(['/api/admin/cars/image', '/api/admin/settings/payment-qr']);
   app.use((req, res, next) => {
-    if (req.path === '/api/admin/cars/image') {
+    if (imagePaths.has(req.path)) {
       imageJson(req, res, next);
       return;
     }

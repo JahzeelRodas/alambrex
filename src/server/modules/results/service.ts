@@ -123,3 +123,75 @@ export async function recentResults(limit = 20): Promise<ResultRow[]> {
     createdAt: new Date(r.created_at as string).toISOString(),
   }));
 }
+
+
+export interface EventResultsSummary {
+  id: number;
+  name: string;
+  description: string | null;
+  status: string;
+  racesTotal: number;
+  winnersTotal: number;
+  lastWinAt: string | null;
+}
+
+
+/** Últimas jornadas que tienen al menos un ganador registrado. */
+export async function recentEventsWithWinners(limit = 10): Promise<EventResultsSummary[]> {
+  const [rows] = await pool.query<mysql.RowDataPacket[]>(
+    `SELECT e.id, e.name, e.description, e.status,
+            (SELECT COUNT(*) FROM races r2 WHERE r2.event_id = e.id) AS races_total,
+            COUNT(rr.id) AS winners_total,
+            MAX(rr.created_at) AS last_win_at
+     FROM events e
+     JOIN races r ON r.event_id = e.id
+     JOIN race_results rr ON rr.race_id = r.id AND rr.is_winner = 1
+     GROUP BY e.id
+     ORDER BY last_win_at DESC
+     LIMIT ?`,
+    [limit]
+  );
+  return (rows as unknown as Record<string, unknown>[]).map((r) => ({
+    id: Number(r.id),
+    name: String(r.name),
+    description: r.description != null ? String(r.description) : null,
+    status: String(r.status),
+    racesTotal: Number(r.races_total),
+    winnersTotal: Number(r.winners_total),
+    lastWinAt: r.last_win_at ? new Date(r.last_win_at as string).toISOString() : null,
+  }));
+}
+
+
+export interface EventWinnersRow {
+  raceId: number;
+  raceNumber: number;
+  lane: number;
+  carName: string;
+  participantName: string;
+  finishedAt: string | null;
+}
+
+
+/** Ganadores de todas las carreras de una jornada, ordenados por número de carrera. */
+export async function eventWinners(eventId: number): Promise<EventWinnersRow[]> {
+  const [rows] = await pool.query<mysql.RowDataPacket[]>(
+    `SELECT rr.lane, rr.created_at, r.id AS race_id, r.race_number, r.finished_at,
+            c.name AS car_name, res.participant_name
+     FROM race_results rr
+     JOIN races r ON r.id = rr.race_id
+     JOIN cars c ON c.id = rr.car_id
+     JOIN reservations res ON res.id = rr.reservation_id
+     WHERE rr.is_winner = 1 AND r.event_id = ?
+     ORDER BY r.race_number ASC, rr.created_at DESC`,
+    [eventId]
+  );
+  return (rows as unknown as Record<string, unknown>[]).map((r) => ({
+    raceId: Number(r.race_id),
+    raceNumber: Number(r.race_number),
+    lane: Number(r.lane),
+    carName: String(r.car_name),
+    participantName: String(r.participant_name),
+    finishedAt: r.finished_at ? new Date(r.finished_at as string).toISOString() : null,
+  }));
+}

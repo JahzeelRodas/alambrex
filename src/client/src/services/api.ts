@@ -6,6 +6,8 @@ import type {
   CarRow,
   DashboardData,
   EventRow,
+  EventWinnerRow,
+  PastEventSummary,
   PublicCar,
   PublicEventData,
   ReservationCreated,
@@ -81,6 +83,13 @@ export const api = {
     request<StreamPayload>(`/public/races/${id}/stream`, { signal }),
   getResults: (signal?: AbortSignal) =>
     request<{ results: ResultRow[] }>('/public/results', { signal }),
+  getResultsEvents: (signal?: AbortSignal) =>
+    request<{ events: PastEventSummary[] }>('/public/results/events', { signal }),
+  getEventWinners: (eventId: number, signal?: AbortSignal) =>
+    request<{ event: { id: number; name: string } | null; winners: EventWinnerRow[] }>(
+      `/public/results/events/${eventId}`,
+      { signal }
+    ),
   getPublicCars: (signal?: AbortSignal) =>
     request<{ cars: PublicCar[] }>('/public/cars', { signal }),
   createReservation: (body: {
@@ -172,6 +181,10 @@ export const api = {
   getAdminSettings: (signal?: AbortSignal) => request<AdminSettings>('/admin/settings', { signal }),
   updateSetting: (key: string, value: string) =>
     request<AdminSettings>('/admin/settings', { method: 'PUT', body: { key, value } }),
+  uploadPaymentQr: (dataUrl: string) =>
+    request<{ url: string }>('/admin/settings/payment-qr', { method: 'POST', body: { dataUrl } }),
+  removePaymentQr: () =>
+    request<{ ok: boolean }>('/admin/settings/payment-qr', { method: 'DELETE' }),
   listAudit: (params: { limit?: number; offset?: number; action?: string } = {}, signal?: AbortSignal) => {
     const qs = new URLSearchParams();
     if (params.limit) qs.set('limit', String(params.limit));

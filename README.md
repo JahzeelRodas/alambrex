@@ -142,7 +142,7 @@ Los valores de negocio (cuota, expiración, WhatsApp y las frecuencias de pollin
 | **Carreras** | Crear carrera (numeración automática), *Iniciar* / *Finalizar* / *Reabrir* / *Cancelar* (al cancelar se liberan los carriles), **Mostrar en /stream** (selección de carrera activa) y **Registrar ganador** (clic sobre un carril confirmado). |
 | **Coches** | Alta/edición/baja de la flota (nombre, modelo, color, imagen), activar/desactivar. |
 | **Inscripciones** | Tabla con filtros por estado; confirmar pago (método, monto, referencia, nota), extender plazo, reactivar expiradas, cancelar. |
-| **Ajustes & Historial** | WhatsApp, cuota, expiración y frecuencias de polling; bitácora completa de acciones. |
+| **Ajustes & Historial** | WhatsApp, cuota, expiración y frecuencias de polling; **código QR de pago** (subir/quitar; se muestra en `/status/:token` junto al conteo regresivo, útil si el QR vence y hay que renovarlo); bitácora completa de acciones. |
 
 El panel se refresca por polling (3–5 s configurable).
 
@@ -190,8 +190,8 @@ El panel se refresca por polling (3–5 s configurable).
 | `GET /api/public/stream` | Público | Payload de `/stream` (carrera activa, versión, pollMs) |
 | `GET /api/public/races/:id/stream` | Público | Payload de streaming de una carrera concreta |
 | `GET /api/public/results` | Público | Últimos ganadores |
-| `POST /api/public/reservations` | Público (rate-limited) | Crear solicitud de inscripción → devuelve token + URL de WhatsApp |
-| `GET /api/public/reservations/:token` | Público | Estado de la reserva por token |
+| `POST /api/public/reservations` | Público (rate-limited) | Crear solicitud de inscripción → devuelve token + URL de WhatsApp (+ QR de pago si está configurado) |
+| `GET /api/public/reservations/:token` | Público | Estado de la reserva por token (+ URL de WhatsApp y QR de pago si está pendiente de pago) |
 | `POST /api/admin/auth/login` / `logout` | Público/privado | Sesión (cookie httpOnly) |
 | `GET /api/admin/auth/me` | Sesión | Administrador actual + token CSRF |
 | `GET /api/admin/dashboard` | Sesión | Agregado del panel |
@@ -203,6 +203,7 @@ El panel se refresca por polling (3–5 s configurable).
 | `POST /api/admin/reservations/:id/confirm-payment` | Sesión+CSRF | Confirmar pago (idempotente) |
 | `POST /api/admin/reservations/:id/reactivate` / `cancel` | Sesión+CSRF | Revalidar / cancelar |
 | `GET/PUT /api/admin/settings` | Sesión+CSRF | Ajustes configurables |
+| `POST/DELETE /api/admin/settings/payment-qr` | Sesión+CSRF | Subir/quitar el código QR de pago (JSON base64; guarda el archivo en `uploads/payment/` y su URL en `settings.payment_qr_url`) |
 | `GET /api/admin/audit` | Sesión | Historial de acciones |
 
 Las mutaciones administrativas requieren la cabecera `X-CSRF-Token` (el cliente la obtiene de `login` / `me`).

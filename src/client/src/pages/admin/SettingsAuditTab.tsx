@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '../../services/api';
 import { usePolling } from '../../hooks/usePolling';
+import { fileToResizedDataUrl } from '../../services/image';
 import type { AdminSettings } from '../../types/api';
 
 const FIELDS: { key: keyof AdminSettings; apiKey: string; label: string; hint: string }[] = [
@@ -34,6 +35,13 @@ export default function SettingsAuditTab({ refresh }: { refresh: () => void }) {
   const dirty = useRef(false);
 
   const [audit, setAudit] = useState<{ rows: { id: number; action: string; admin_username: string | null; created_at: string; entity: string | null; entity_id: number | null; details: string | null; ip: string | null }[]; total: number } | null>(null);
+
+  // Estado del widget "Código QR de pago".
+  const [qrPreview, setQrPreview] = useState<string | null>(null);
+  const [qrBusy, setQrBusy] = useState(false);
+  const [qrMessage, setQrMessage] = useState<string | null>(null);
+  const currentQrUrl = settings.data?.paymentQrUrl || null;
+  const previewSource = qrPreview ?? currentQrUrl;
 
   useEffect(() => {
     const data = settings.data;
@@ -81,6 +89,52 @@ export default function SettingsAuditTab({ refresh }: { refresh: () => void }) {
     }
   }
 
+  async function pickQr(file: File | null): Promise<void> {
+    setQrMessage(null);
+    if (!file) {
+      setQrPreview(null);
+      return;
+    }
+    try {
+      setQrPreview(await fileToResizedDataUrl(file));
+    } catch (err) {
+      setQrMessage(err instanceof Error ? err.message : 'No se pudo leer la imagen.');
+    }
+  }
+
+  async function saveQr(): Promise<void> {
+    if (!qrPreview) return;
+    setQrBusy(true);
+    setQrMessage(null);
+    try {
+      await api.uploadPaymentQr(qrPreview);
+      setQrPreview(null);
+      setQrMessage('✓ Código QR actualizado');
+      settings.refresh();
+      refresh();
+    } catch (err) {
+      setQrMessage(err instanceof ApiError ? err.message : 'Error de conexión');
+    } finally {
+      setQrBusy(false);
+    }
+  }
+
+  async function removeQr(): Promise<void> {
+    setQrBusy(true);
+    setQrMessage(null);
+    try {
+      await api.removePaymentQr();
+      setQrPreview(null);
+      setQrMessage('✓ Código QR eliminado');
+      settings.refresh();
+      refresh();
+    } catch (err) {
+      setQrMessage(err instanceof ApiError ? err.message : 'Error de conexión');
+    } finally {
+      setQrBusy(false);
+    }
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-2">
       <section className="panel p-5">
@@ -109,6 +163,64 @@ export default function SettingsAuditTab({ refresh }: { refresh: () => void }) {
             {busy ? 'Guardando…' : saved ? '✓ Guardado' : 'Guardar cambios'}
           </button>
         </form>
+
+        <div className="mt-6 border-t border-line pt-5">
+          <h4 className="font-display font-bold italic text-sm text-silver mb-1">
+            Código QR de pago
+          </h4>
+          <p className="font-tech text-xs text-ash/60 mb-3">
+            Se muestra en la página de la reserva, junto al conteo regresivo. Si tu QR tiene fecha
+            de vencimiento, sube uno nuevo cuando expire; los usuarios verán el cambio
+            automáticamente.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="shrink-0">
+              {previewSource ? (
+                <img
+                  src={previewSource}
+                  alt={qrPreview ? 'QR nuevo (por guardar)' : 'Código QR de pago actual'}
+                  className="h-32 w-32 rounded-lg border border-line bg-white p-1.5 object-contain"
+                />
+              ) : (
+                <div className="flex h-32 w-32 items-center justify-center rounded-lg border border-dashed border-line px-2 text-center font-tech text-xs text-ash/50">
+                  Sin QR configurado
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={(e) => void pickQr(e.target.files?.[0] ?? null)}
+                className="block w-full cursor-pointer font-mono text-xs text-ash/80 hover:text-silver file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-neon/15 file:px-3 file:py-1.5 file:font-tech file:text-neon hover:file:bg-neon/25"
+              />
+              <p className="font-tech text-xs text-ash/60">
+                Recomendado: PNG del QR limpio (sin recortes y con buen contraste).
+              </p>
+              <div className="flex gap-2">
+                {qrPreview && (
+                  <button type="button" className="btn-neon !px-3 !py-1.5 text-xs" disabled={qrBusy} onClick={() => void saveQr()}>
+                    {qrBusy ? 'Guardando…' : 'Guardar QR'}
+                  </button>
+                )}
+                {currentQrUrl && !qrPreview && (
+                  <button type="button" className="btn-ghost !px-3 !py-1.5 text-xs" disabled={qrBusy} onClick={() => void removeQr()}>
+                    {qrBusy ? 'Quitando…' : 'Quitar QR'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          {qrMessage && (
+            <p
+              className={`mt-2 font-tech text-xs ${
+                qrMessage.startsWith('✓') ? 'text-neon' : 'text-red-300'
+              }`}
+            >
+              {qrMessage}
+            </p>
+          )}
+        </div>
       </section>
 
       <section>

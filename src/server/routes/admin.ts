@@ -4,6 +4,7 @@ import { asyncHandler } from '../middleware/errors';
 import { requireAdmin, requireCsrf } from '../middleware/session';
 import { getDashboard } from '../modules/dashboard/service';
 import * as settings from '../modules/settings/service';
+import { settingsRouter } from '../modules/settings/routes';
 import { listAudit } from '../modules/audit/service';
 import { authRouter } from '../modules/auth/routes';
 import { eventsRouter } from '../modules/events/routes';
@@ -21,6 +22,7 @@ const settingSchema = z.object({
     'admin_poll_ms',
     'availability_poll_ms',
     'stream_url',
+    'payment_qr_url',
   ]),
   value: z.string().min(1).max(500),
 });
@@ -74,6 +76,7 @@ export function buildAdminRouter(): Router {
 
   admin.use('/events', eventsRouter);
   admin.use('/cars', carsRouter);
+  admin.use('/settings', settingsRouter);
   admin.use('/races', racesRouter);
   admin.use('/reservations', reservationsRouter);
   admin.use('/reservations', paymentsRouter);

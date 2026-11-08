@@ -9,6 +9,7 @@ const KEYS = [
   'admin_poll_ms',
   'availability_poll_ms',
   'stream_url',
+  'payment_qr_url',
 ] as const;
 
 export type SettingKey = (typeof KEYS)[number];
@@ -21,6 +22,7 @@ export type AppSettings = {
   adminPollMs: number;
   availabilityPollMs: number;
   streamUrl?: string;
+  paymentQrUrl?: string;
 };
 
 interface CacheEntry {
@@ -40,6 +42,7 @@ function defaults(): AppSettings {
     adminPollMs: 4000,
     availabilityPollMs: 5000,
     streamUrl: '',
+    paymentQrUrl: '',
   };
 }
 
@@ -59,6 +62,7 @@ export async function getSettings(force = false): Promise<AppSettings> {
     adminPollMs: toInt(map.get('admin_poll_ms'), base.adminPollMs),
     availabilityPollMs: toInt(map.get('availability_poll_ms'), base.availabilityPollMs),
     streamUrl: map.get('stream_url')?.trim() || base.streamUrl,
+    paymentQrUrl: map.get('payment_qr_url')?.trim() || base.paymentQrUrl,
   };
 
   cache = { at: Date.now(), settings };

@@ -69,6 +69,8 @@ export interface PublicReservation {
 export interface ReservationCreated {
   reservation: PublicReservation;
   whatsappUrl: string | null;
+  /** Código QR de pago (opcional, subido desde el panel). */
+  paymentQrUrl?: string | null;
 }
 
 export interface PublicCar {
@@ -95,6 +97,25 @@ export interface ResultRow {
   participantName: string;
   finishedAt: string | null;
   createdAt: string;
+}
+
+export interface PastEventSummary {
+  id: number;
+  name: string;
+  description: string | null;
+  status: string;
+  racesTotal: number;
+  winnersTotal: number;
+  lastWinAt: string | null;
+}
+
+export interface EventWinnerRow {
+  raceId: number;
+  raceNumber: number;
+  lane: number;
+  carName: string;
+  participantName: string;
+  finishedAt: string | null;
 }
 
 export interface EventRow {
@@ -167,6 +188,7 @@ export interface AdminSettings {
   adminPollMs: number;
   availabilityPollMs: number;
   streamUrl?: string;
+  paymentQrUrl?: string;
 }
 
 export interface AdminMe {

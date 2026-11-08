@@ -125,6 +125,31 @@ publicRouter.get(
 );
 
 
+publicRouter.get(
+  '/results/events',
+  asyncHandler(async (_req, res) => {
+    res.json({ events: await results.recentEventsWithWinners(10) });
+  })
+);
+
+
+publicRouter.get(
+  '/results/events/:eventId',
+  asyncHandler(async (req, res) => {
+    const eventId = Number(req.params.eventId);
+    if (!Number.isInteger(eventId) || eventId <= 0) {
+      throw new ApiError(400, 'BAD_REQUEST', 'Jornada inválida');
+    }
+    const eventData = await events.getEvent(eventId);
+    if (!eventData) throw new ApiError(404, 'NOT_FOUND', 'Jornada no encontrada');
+    res.json({
+      event: { id: eventData.id, name: eventData.name },
+      winners: await results.eventWinners(eventId),
+    });
+  })
+);
+
+
 publicRouter.post(
   '/reservations',
   reservationLimiter.middleware,
@@ -149,7 +174,7 @@ publicRouter.post(
       ? buildWhatsAppUrl(settings.whatsappNumber, message)
       : null;
 
-    res.status(201).json({ reservation: view, whatsappUrl });
+    res.status(201).json({ reservation: view, whatsappUrl, paymentQrUrl: settings.paymentQrUrl });
   })
 );
 
@@ -160,6 +185,7 @@ publicRouter.get(
     const view = await reservations.getReservationByToken(String(req.params.token));
     if (!view) throw new ApiError(404, 'NOT_FOUND', 'Inscripción no encontrada');
     let whatsappUrl: string | null = null;
+    let paymentQrUrl: string | null = null;
     if (view.status === 'pending_payment') {
       const settings = await getSettings();
       if (settings.whatsappNumber) {
@@ -174,7 +200,8 @@ publicRouter.get(
         });
         whatsappUrl = buildWhatsAppUrl(settings.whatsappNumber, message);
       }
+      paymentQrUrl = settings.paymentQrUrl || null;
     }
-    res.json({ reservation: view, whatsappUrl });
+    res.json({ reservation: view, whatsappUrl, paymentQrUrl });
   })
 );

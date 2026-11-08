@@ -6,8 +6,9 @@ import Brand from '../components/Brand';
 import CircuitBackground from '../components/CircuitBackground';
 import LaneRow from '../components/LaneRow';
 import CarCard from '../components/CarCard';
+import Modal from '../components/Modal';
 import { IconFlag, IconWhatsApp, SectionTitle, StatusPill } from '../components/Neon';
-import type { RaceSummary } from '../types/api';
+import type { EventWinnerRow, PastEventSummary, RaceSummary } from '../types/api';
 
 interface Selection {
   raceId: number;
@@ -33,7 +34,7 @@ export default function HomePage() {
   const [pollMs, setPollMs] = useState(5000);
   const eventData = usePolling(api.getPublicEvent, pollMs);
   const carsData = usePolling(api.getPublicCars, 30000);
-  const resultsData = usePolling(api.getResults, 30000);
+  const resultsData = usePolling(api.getResultsEvents, 30000);
 
   const { data, refresh } = eventData;
 
@@ -41,6 +42,29 @@ export default function HomePage() {
   useEffect(() => {
     if (data?.pollMs && data.pollMs !== pollMs) setPollMs(data.pollMs);
   }, [data?.pollMs, pollMs]);
+
+  // Modal de ganadores por jornada
+  const [winnersEvent, setWinnersEvent] = useState<PastEventSummary | null>(null);
+  const [winners, setWinners] = useState<EventWinnerRow[] | null>(null);
+  const [winnersLoading, setWinnersLoading] = useState(false);
+  const [winnersError, setWinnersError] = useState<string | null>(null);
+
+  const openWinners = useCallback(async (ev: PastEventSummary) => {
+    setWinnersEvent(ev);
+    setWinners(null);
+    setWinnersError(null);
+    setWinnersLoading(true);
+    try {
+      const data = await api.getEventWinners(ev.id);
+      setWinners(data.winners);
+    } catch (error) {
+      setWinnersError(
+        error instanceof ApiError ? error.message : 'No se pudieron cargar los ganadores'
+      );
+    } finally {
+      setWinnersLoading(false);
+    }
+  }, []);
 
   const [selection, setSelection] = useState<Selection | null>(null);
   const [lane, setLane] = useState<number | null>(null);
@@ -385,35 +409,106 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* Resultados recientes */}
+        {/* Últimas jornadas con ganadores */}
         <section className="mt-12">
           <SectionTitle kicker="Historial">Últimos ganadores</SectionTitle>
-          {(resultsData.data?.results ?? []).length === 0 ? (
+          {(resultsData.data?.events ?? []).length === 0 ? (
             <div className="panel p-6 text-center font-tech text-ash">
-              Todavía no se ha registrado ningún ganador.
+              Todavía no hay jornadas con ganadores registrados.
             </div>
           ) : (
             <div className="panel divide-y divide-line">
-              {(resultsData.data?.results ?? []).map((result) => (
+              {(resultsData.data?.events ?? []).map((ev) => (
                 <div
-                  key={result.id}
-                  className="flex items-center gap-4 px-4 py-3 hover:bg-panel2/50 transition-colors"
+                  key={ev.id}
+                  className="flex items-center gap-4 px-4 py-4 hover:bg-panel2/50 transition-colors"
                 >
-                  <span className="font-mono text-neon w-16">#{result.raceNumber}</span>
-                  <span className="font-display font-bold italic text-silver flex-1 truncate">
-                    {result.participantName}
-                  </span>
-                  <span className="hidden sm:block font-tech text-ash text-sm truncate max-w-[180px]">
-                    {result.carName}
-                  </span>
-                  <span className="font-tech text-xs text-ash/70 whitespace-nowrap">
-                    {result.eventName}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-bold italic text-silver truncate">
+                      {ev.name}
+                    </div>
+                    <div className="font-tech text-xs text-ash/70 mt-1">
+                      <span>
+                        {ev.racesTotal} {ev.racesTotal === 1 ? 'carrera' : 'carreras'} ·{' '}
+                        {ev.winnersTotal} {ev.winnersTotal === 1 ? 'ganador' : 'ganadores'}
+                      </span>
+                      {ev.lastWinAt && (
+                        <span className="hidden sm:inline">
+                          {' '}
+                          · {formatDayLabel(ev.lastWinAt)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-outline !py-2 !px-4 text-sm whitespace-nowrap"
+                    onClick={() => openWinners(ev)}
+                  >
+                    Ver Ganadores
+                  </button>
                 </div>
               ))}
             </div>
           )}
         </section>
+
+        {/* Modal de ganadores de una jornada */}
+        <Modal
+          open={winnersEvent !== null}
+          title={`Ganadores · ${winnersEvent?.name ?? ''}`}
+          onClose={() => setWinnersEvent(null)}
+        >
+          {winnersLoading && (
+            <p className="font-tech text-ash text-sm animate-pulse-live">Cargando ganadores…</p>
+          )}
+          {winnersError && (
+            <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 font-tech text-sm text-red-300">
+              {winnersError}
+            </p>
+          )}
+          {!winnersLoading && winners !== null && winners.length === 0 && (
+            <p className="font-tech text-ash text-sm">
+              Sin ganadores registrados en esta jornada.
+            </p>
+          )}
+          {!winnersLoading && winners !== null && winners.length > 0 && (
+            <div className="space-y-4">
+              {groupWinnersByRace(winners).map((group) => (
+                <div
+                  key={group.raceId}
+                  className="rounded-lg border border-line bg-void/40 overflow-hidden"
+                >
+                  <div className="px-3 py-2 bg-panel2/60 border-b border-line font-mono text-neon text-sm">
+                    Carrera #{group.raceNumber} {' '}
+                    {group.winners.length === 1 ? 'GANADOR' : 'ganadores'}
+                  </div>
+                  <div className="divide-y divide-line">
+                    {group.winners.map((winner, i) => (
+                      <div
+                        key={`${winner.raceId}-${winner.lane}-${i}`}
+                        className="flex items-center gap-3 px-3 py-2.5"
+                      >
+                        <span className="font-mono text-neon text-xs w-14 whitespace-nowrap">
+                          Carril {winner.lane}
+                        </span>
+                        <span className="font-display font-bold italic text-silver flex-1 truncate">
+                          {winner.participantName}
+                        </span>
+                        <span className="hidden sm:block font-tech text-ash text-xs truncate max-w-[140px]">
+                          {winner.carName}
+                        </span>
+                        <span className="font-tech text-[11px] text-ash/60 whitespace-nowrap">
+                          {winner.finishedAt ? formatDateTimeLabel(winner.finishedAt) : '—'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal>
       </main>
 
       <footer className="relative z-10 border-t border-line bg-void/80">
@@ -434,4 +529,43 @@ export default function HomePage() {
       </footer>
     </div>
   );
+}
+
+interface WinnersGroup {
+  raceId: number;
+  raceNumber: number;
+  winners: EventWinnerRow[];
+}
+
+function groupWinnersByRace(winners: EventWinnerRow[]): WinnersGroup[] {
+  const groups: WinnersGroup[] = [];
+  const index = new Map<number, WinnersGroup>();
+  for (const winner of winners) {
+    let group = index.get(winner.raceId);
+    if (!group) {
+      group = { raceId: winner.raceId, raceNumber: winner.raceNumber, winners: [] };
+      index.set(winner.raceId, group);
+      groups.push(group);
+    }
+    group.winners.push(winner);
+  }
+  return groups;
+}
+
+function formatDayLabel(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function formatDateTimeLabel(iso: string): string {
+  return new Date(iso).toLocaleString('es-MX', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
