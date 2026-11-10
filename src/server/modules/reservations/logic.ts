@@ -54,7 +54,7 @@ export function buildReservationMessage(input: ReservationMessageInput): string 
     `*Referencia:* ${input.token}`,
   ];
   if (input.price !== null && input.price !== undefined && input.price > 0) {
-    lines.push(`*Cuota:* $${input.price}`);
+    lines.push(`*Monto:* Bs.${input.price}`);
   }
   lines.push('Quedo pendiente de la confirmación de pago. ¡Gracias!');
   return lines.join('\n');

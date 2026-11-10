@@ -208,9 +208,9 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill status={data.event.status} />
-                  {data.price > 0 && (
+                  {/*{data.price > 0 && (
                     <span className="pill border border-neon/40 text-neon">Cuota ${data.price}</span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -380,9 +380,9 @@ export default function HomePage() {
                       Carrera #{selection.raceNumber} · Carril {lane ?? '—'} ·{' '}
                       {carsData.data?.cars.find((c) => c.id === carId)?.name ?? 'coche sin elegir'}
                     </span>
-                    {Boolean(data?.price && data.price > 0) && (
-                      <span className="text-neon"> · Cuota ${data?.price}</span>
-                    )}
+                   {/*  {Boolean(data?.price && data.price > 0) && (
+                       <span className="text-neon"> · Cuota ${data?.price}</span>
+                    )}*/}
                   </div>
 
                   {formError && (

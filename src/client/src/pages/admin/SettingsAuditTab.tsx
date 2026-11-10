@@ -163,7 +163,7 @@ export default function SettingsAuditTab({ refresh }: { refresh: () => void }) {
             {busy ? 'Guardando…' : saved ? '✓ Guardado' : 'Guardar cambios'}
           </button>
         </form>
-
+          {/*
         <div className="mt-6 border-t border-line pt-5">
           <h4 className="font-display font-bold italic text-sm text-silver mb-1">
             Código QR de pago
@@ -220,7 +220,7 @@ export default function SettingsAuditTab({ refresh }: { refresh: () => void }) {
               {qrMessage}
             </p>
           )}
-        </div>
+        </div> */}
       </section>
 
       <section>
